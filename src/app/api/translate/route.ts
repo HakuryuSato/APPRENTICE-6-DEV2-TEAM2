@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Translator } from "deepl-node";
 
 // 環境変数を使用する場合
-const authKey = "6bd0c0b1-1b3a-4b97-a85e-0560b63f05bb:fx";
+const authKey = "6bd0c0b1-1b3a-4b97-a85e-0560b63f05bb:fx"; // 一旦、直で貼ってます
 const translator = new Translator(authKey);
 
 export async function POST(req: NextRequest) {
