@@ -4,6 +4,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Button } from '@/components/ui/button';
 
 export default function GamePage() {
   const pathname = usePathname();
@@ -84,7 +85,7 @@ export default function GamePage() {
       <h1>Game: {gameId}</h1>
       <h2>Round: {round}</h2>
       {!isReady && (
-        <button onClick={handleReady}>準備完了</button>
+        <Button onClick={handleReady}>準備完了</Button>
       )}
       {allReady && (
         <div>
@@ -92,10 +93,10 @@ export default function GamePage() {
           {images[round - 1] ? (
             <div>
               <img src={images[round - 1]} alt="Generated" width={256} height={256}/>
-              <button onClick={handleNextRound}>次のラウンドへ</button>
+              <Button onClick={handleNextRound}>次のラウンドへ</Button>
             </div>
           ) : (
-            <button onClick={handleGenerateImage}>画像生成</button>
+            <Button onClick={handleGenerateImage}>画像生成</Button>
           )}
         </div>
       )}

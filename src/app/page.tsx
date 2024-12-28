@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+
 
 export default function HomePage() {
   const [gameId, setGameId] = useState('');
@@ -18,7 +20,7 @@ export default function HomePage() {
     <form onSubmit={handleSubmit}>
       <h1>Enter Game Session ID</h1>
       <input value={gameId} onChange={(e) => setGameId(e.target.value)} placeholder="Game ID" />
-      <button type="submit">Join Game</button>
+      <Button type="submit">Join Game</Button>
     </form>
   );
 }
