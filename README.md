@@ -1,3 +1,6 @@
+## package.json変更時の注意事項
+npm installでnode_modulesの更新が必要です
+
 ## ディレクトリ構造（案）
 ```
 ├── src/
