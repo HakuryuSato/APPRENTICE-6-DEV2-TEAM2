@@ -64,7 +64,6 @@ npm installでnode_modulesの更新が必要です
 |-------------------------------------|--------------|---------------------|
 | Reactコンポーネント全般（components/）  | パスカル     | `CustomButton.tsx`   |
 | React Page用コンポーネント（components/）  | パスカル     | `GamePage.tsx`   |
-| React Layout用コンポーネント（components/）  | パスカル     | `VoteLayout.tsx`   |
 | ReactカスタムHooks（hooks/）        | キャメル     | `useCustomButtonHook.ts`  |
 | api（api/）                         | 小文字のみ   | `image/generate/route.ts`     |
 | 型定義ファイル（types/）            | パスカル     | `GeneratedImage.ts`       |
