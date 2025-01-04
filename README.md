@@ -14,8 +14,13 @@ npm installでnode_modulesの更新が必要です
 │   ├── components/
 │   │   ├── ui
 │   │   └── game/
-│   │       ├── GameHome.tsx
-│   │       └── コンポーネント名.tsx
+│   │   │   ├── GamePage.tsx
+│   │   │   └── layouts
+│   │   │       └── レイアウト名.tsx
+│   │   └── top/
+│   │       ├── TopPage.tsx
+│   │       └── layouts
+│   │           └── レイアウト名.tsx
 │   ├── hooks/
 │   │   ├── ui/
 │   │   │   └── use + ui名.ts
@@ -30,7 +35,6 @@ npm installでnode_modulesの更新が必要です
 │       ├── common/
 │       └── server/
 └── middleware.ts
-
 ```
 
 ## ディレクトリ/ファイル解説
@@ -42,6 +46,7 @@ npm installでnode_modulesの更新が必要です
 | `src/components/`          |     Reactコンポーネント         |
 | `src/components/ui/`       |     shadcn/uiのコンポーネント         |
 | `src/components/game/` |          ゲーム画面用のコンポーネント    |
+| `src/components/top/` |          トップ画面用のコンポーネント    |
 | `src/hooks/`               | useState,handleClickなど、ReactコンポーネントのJSX以外を格納  |
 | `src/lib/`                 |   ライブラリ特有の設定用関数などを格納           |
 | `src/atoms/`              |  グローバルな状態管理を行うJotai用       |
@@ -57,7 +62,9 @@ npm installでnode_modulesの更新が必要です
 ## ディレクトリ/ファイル命名規則（案）
 | 種別（ディレクトリ名）                  | 命名規則     | 例                  |
 |-------------------------------------|--------------|---------------------|
-| Reactコンポーネント（components/）  | パスカル     | `CustomButton.tsx`   |
+| Reactコンポーネント全般（components/）  | パスカル     | `CustomButton.tsx`   |
+| React Page用コンポーネント（components/）  | パスカル     | `GamePage.tsx`   |
+| React Layout用コンポーネント（components/）  | パスカル     | `VoteLayout.tsx`   |
 | ReactカスタムHooks（hooks/）        | キャメル     | `useCustomButtonHook.ts`  |
 | api（api/）                         | 小文字のみ   | `image/generate/route.ts`     |
 | 型定義ファイル（types/）            | パスカル     | `GeneratedImage.ts`       |
@@ -70,4 +77,4 @@ npm installでnode_modulesの更新が必要です
 |-------|--------------|--------------------|----------------------------------------------------------------|
 | API   | POST         | /image/generate    | 渡されたプロンプトに応じて生成された画像を1枚返す               |
 | API   | POST         | /image/similarity  | 渡された画像数枚とテーマのテキストから類似度を計算し返す       |
-
+| API   | POST         | /image/translate  | 渡された日本語のテキストを英語にして返す       |
