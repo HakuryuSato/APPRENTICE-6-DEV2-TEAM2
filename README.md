@@ -65,7 +65,7 @@ npm installでnode_modulesの更新が必要です
 | Reactコンポーネント全般（components/）  | パスカル     | `CustomButton.tsx`   |
 | React Page用コンポーネント（components/）  | パスカル     | `GamePage.tsx`   |
 | ReactカスタムHooks（hooks/）        | キャメル     | `useCustomButtonHook.ts`  |
-| api（api/）                         | 小文字のみ   | `image/generate/route.ts`     |
+| apiエンドポイント名（api/）    | ケバブ   | `image/generate-image/route.ts`     |
 | 型定義ファイル（types/）            | パスカル     | `GeneratedImage.ts`       |
 | style名（styles/）                  | パスカル     | `GlobalStyle.ts`    |
 | store用ファイル名（stores/）        | パスカル     | `GameHomeStore.ts`       |
@@ -74,6 +74,7 @@ npm installでnode_modulesの更新が必要です
 ## API一覧
 | 種別  | HTTPメソッド | URI                | 説明                                                            |
 |-------|--------------|--------------------|----------------------------------------------------------------|
-| API   | POST         | /image/generate    | 渡されたプロンプトに応じて生成された画像を1枚返す               |
-| API   | POST         | /image/similarity  | 渡された画像数枚とテーマのテキストから類似度を計算し返す       |
-| API   | POST         | /image/translate  | 渡された日本語のテキストを英語にして返す       |
+| API   | GET/POST         | api/game-state    | ゲーム進行状況の確認と更新を行う               |
+| API   | POST         | api/generate-image    | 渡されたプロンプトに応じて生成された画像を1枚返す               |
+| API   | POST         | api/translate  | 渡された日本語のテキストを英語にして返す       |
+| API   | POST         | api/similarity  | 渡された画像数枚とテーマのテキストから類似度を計算し返す       |
