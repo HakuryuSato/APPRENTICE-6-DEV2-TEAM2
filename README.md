@@ -34,6 +34,7 @@ npm installでnode_modulesの更新が必要です
 │       ├── client/
 │       ├── common/
 │       └── server/
+│   　       └── api/
 └── middleware.ts
 ```
 
@@ -56,6 +57,7 @@ npm installでnode_modulesの更新が必要です
 | `src/utils/client/`        |     クライアントサイドで使用する関数群         |
 | `src/utils/common/`        |     サーバー、クライアント両方で使用する関数群         |
 | `src/utils/server/`        |     サーバーサイドでのみ使用する関数群         |
+| `src/utils/server/api`        |     APIで行う処理を記述した関数群         |
 | `middleware.ts`             |     アクセスしてきたユーザーをそれぞれのgame-uuidにリダイレクトするために使用  |
 
 
