@@ -4,6 +4,7 @@ export const useSignUp = () => {
   const [inputText, setInputText] = useState('');
 
   const handleClickSubmit = () => {
+    // ここでinputTextをGlobalStateのuserNameに格納するよう変更
     console.log(inputText);
   };
 
