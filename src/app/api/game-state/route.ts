@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGameState, updateGameState } from '@/app/utils/store'
+import { getGameState, updateGameState } from '@/utils/server/store'
 import { randomUUID } from 'crypto';
 
 function getAllReady(players: Record<string, boolean>) {
