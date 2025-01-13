@@ -6,6 +6,7 @@ response.dataからの展開はこの関数内で行い、展開後のデータ�
 import type { GenerateImageResponse } from "@/types/GenerateImage";
 import { TranslatePromptResponse } from "@/types/TranslatePrompt";
 import type { GameState, GameStateRequest } from "@/types/GameState";
+import { UserStatus } from "@/types/UserStatus";
 
 /**
  * 共通のAPI fetchエラーハンドリング関数
@@ -73,10 +74,20 @@ export async function fetchGameState(gameId: string): Promise<GameState | null> 
 }
 
 // ゲーム状態を更新 -------------------------------------------------
-export async function updateGameState(gameStateRequest: GameStateRequest): Promise<void> {
+export async function updateGameState({
+  gameId,
+  gameStateRequestType,
+  userStatus,
+}: GameStateRequest): Promise<void> {
+  const gameStateRequest = {
+    gameId,
+    gameStateRequestType,
+    userStatus
+  }
   await handleFetchApi<void>(`/api/game-state`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(gameStateRequest),
   });
 }
+
