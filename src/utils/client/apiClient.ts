@@ -3,7 +3,8 @@
 response.dataからの展開はこの関数内で行い、展開後のデータをクライアントサイドへ返している。
 */
 
-import type { GenerateImageResponse } from '@/types/GenerateImage'
+import type { GenerateImageResponse } from "@/types/GenerateImage";
+import { TranslatePromptResponse } from "@/types/TranslatePrompt";
 /**
  * 共通のAPI fetchエラーハンドリング関数
  * 指定されたURLにHTTPリクエストを送信し、レスポンスのJSONデータを取得します。
@@ -14,35 +15,48 @@ import type { GenerateImageResponse } from '@/types/GenerateImage'
  * @returns {Promise<T>} - レスポンスから抽出されたデータを型Tを含むPromiseとして返す
  * @throws {Error} - フェッチ処理中にエラーが発生した場合の処理
  */
-async function handleFetchApi<T> (
+async function handleFetchApi<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
   try {
-    const response = await fetch(url, options)
-    const result = await response.json()
+    const response = await fetch(url, options);
+    const result = await response.json();
 
-    if (response.ok && result && 'data' in result) {
-      console.log('apiClient:', result.data)
-      return result.data as T
+    if (response.ok && result && "data" in result) {
+      console.log("apiClient:", result.data);
+      return result.data as T;
     } else {
-      console.error(`Error fetching ${url}:`, result)
-      return [] as unknown as T
+      console.error(`Error fetching ${url}:`, result);
+      return [] as unknown as T;
     }
   } catch (error) {
-    console.error('An error occurred:', error)
-    return [] as unknown as T
+    console.error("An error occurred:", error);
+    return [] as unknown as T;
   }
 }
 
-
 // プロンプトから画像生成 -------------------------------------------------
-export async function fetchGenerateImage (
+export async function fetchGenerateImage(
   prompt: string
 ): Promise<GenerateImageResponse | null> {
-  return await handleFetchApi<GenerateImageResponse>('/api/generate-image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
-  })
+  return await handleFetchApi<GenerateImageResponse>("/api/generate-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+}
+
+// プロンプトを英語に翻訳 --------------------------------------------------
+export async function fetchTranslatePrompt(
+  prompt: string
+): Promise<TranslatePromptResponse | null> {
+  return await handleFetchApi<TranslatePromptResponse>(
+    "/api/translate-prompt",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: prompt, targetLang: "en-GB" }),
+    }
+  );
 }
