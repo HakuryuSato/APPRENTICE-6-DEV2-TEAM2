@@ -5,6 +5,8 @@ response.dataからの展開はこの関数内で行い、展開後のデータ�
 
 import type { GenerateImageResponse } from "@/types/GenerateImage";
 import { TranslatePromptResponse } from "@/types/TranslatePrompt";
+import type { GameState, GameStateRequest } from "@/types/GameState";
+
 /**
  * 共通のAPI fetchエラーハンドリング関数
  * 指定されたURLにHTTPリクエストを送信し、レスポンスのJSONデータを取得します。
@@ -59,4 +61,22 @@ export async function fetchTranslatePrompt(
       body: JSON.stringify({ text: prompt, targetLang: "en-GB" }),
     }
   );
+}
+
+// ゲーム状態を取得 -------------------------------------------------
+export async function fetchGameState(gameId: string): Promise<GameState | null> {
+  return await handleFetchApi<GameState>(`/api/game-state`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ gameId }),
+  });
+}
+
+// ゲーム状態を更新 -------------------------------------------------
+export async function updateGameState(gameStateRequest: GameStateRequest): Promise<void> {
+  await handleFetchApi<void>(`/api/game-state`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(gameStateRequest),
+  });
 }
