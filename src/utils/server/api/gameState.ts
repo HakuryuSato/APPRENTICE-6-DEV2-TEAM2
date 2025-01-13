@@ -1,94 +1,105 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { GameStateRequest } from '@/types/GameState'
+import type { GameState, GameStateRequest } from '@/types/GameState'
 import type { UserStatus } from '@/types/UserStatus'
 import { getGameState, putGameState } from '@/utils/server/vercelKVStore'
 import { handleExternalApiRequest } from '@/utils/server/handleExternalApiRequest'
 
+// GameState更新用共通関数
+async function handleUpdateGameState (gameState: GameState) {
+  await putGameState(gameState)
+  return NextResponse.json({}, { status: 200 })
+}
+
+// エラー処理用共通関数
+function respondWithError (errorMessage: string, statusCode: number) {
+  return NextResponse.json({ error: errorMessage }, { status: statusCode })
+}
+
+// 全ユーザーが準備完了済みか判定する関数
 function getAllReady (users: UserStatus[]) {
   if (users.length === 0) return false
   return users.every(user => user.isReady)
 }
 
-function toPlayerList (users: UserStatus[]) {
-  return users.map(user => ({ id: user.userId, ready: user.isReady }))
-}
-
+// GameStateを取得する関数
 export async function handleGetGameState (req: NextRequest) {
   return handleExternalApiRequest(async () => {
     const { gameId } = (await req.json()) as GameStateRequest
     const gameState = await getGameState(gameId)
-    if (!gameState) {
-      return NextResponse.json(
-        { error: 'Game state not found' },
-        { status: 404 }
-      )
-    }
+
     return NextResponse.json({
-      allReady: getAllReady(gameState.users)
+      gameState
     })
   })
 }
 
+// GameStateを作成・更新する関数
 export async function handlePutGameState (req: NextRequest) {
   return handleExternalApiRequest(async () => {
-
     // 展開
-    const { gameId, gameStateRequestType, playerId } =
-      (await req.json()) as GameStateRequest & { playerId?: string }
+    const { gameId, gameStateRequestType, userStatus } =
+      (await req.json()) as GameStateRequest
 
     // gameIdまたはgameStateRequestTypeがなければエラー
     if (!gameId || !gameStateRequestType) {
-      return NextResponse.json({ error: 'Missing gameId' }, { status: 400 })
+      return respondWithError('Missing gameId', 400)
     }
+
+    // gameStateの取得
     const gameState = await getGameState(gameId)
 
     // gameStateが存在しなければエラー
     if (!gameState) {
-      return NextResponse.json(
-        { error: 'Game state not found' },
-        { status: 404 }
-      )
+      return respondWithError('Game state not found', 404)
     }
 
-    // RequestTypeに応じて処理
+    // RequestTypeに応じて処理 -------------------------------------------------
     switch (gameStateRequestType) {
-      // ユーザーの追加
-      case 'join': {
-        // ユーザーidがなければエラー
-        if (!playerId){
-          return NextResponse.json(
-            { error: 'playerId not found' },
-            { status: 404 }
-          )
+      case 'create': {
+        // 新たなGameStateの作成
+        const gameState = {
+          gameId: gameId
+        } as GameState
+
+        await handleUpdateGameState(gameState)
+        break
+      }
+
+      case 'enter': {
+        // ユーザーの追加
+        // userIdまたはuserNameがなければエラー
+        if (!userStatus.userId || !userStatus.userName) {
+          return respondWithError('playerId not found', 404)
         }
 
-        // 
-        if (playerId && !gameState.users.some(user => user.userId === playerId)) {
-          gameState.users.push({ userId: playerId, userName: '', isReady: false })
-          await putGameState(gameState)
-        }
+        gameState.users.push({
+          userId: userStatus.userId,
+          userName: userStatus.userName,
+          isReady: true
+        })
 
-        return NextResponse.json({}, { status: 200 })
+        await handleUpdateGameState(gameState)
+        break
       }
 
       // ユーザーの準備完了
       case 'ready': {
-        if (playerId) {
-          const user = gameState.users.find(user => user.userId === playerId)
+        if (userStatus) {
+          const user = gameState.users.find(
+            user => user.userId === userStatus.userId
+          )
           if (user) {
             user.isReady = true
-            await putGameState(gameState)
+            gameState.isAllUsersReady = getAllReady(gameState.users) // フラグ更新
+            await handleUpdateGameState(gameState)
           }
         }
-        return NextResponse.json({
-          round: gameState.round,
-          users: toPlayerList(gameState.users),
-          allReady: getAllReady(gameState.users)
-        })
+
+        break
       }
 
       default:
-        return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
+        return respondWithError('Unknown action', 400)
     }
   })
 }
