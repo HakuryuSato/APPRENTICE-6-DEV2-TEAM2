@@ -8,6 +8,7 @@ export interface GameState {
   gamePhase: GamePhase
   round: number
   users: UserStatus[]
+  isAllUsersReady: boolean
 }
 
 export interface GameStateRequest {
