@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
+import { useAtom } from 'jotai'
+import { userNameAtom } from '@/atoms/state';
 
 export default function GamePage() {
   const pathname = usePathname();
@@ -15,6 +17,8 @@ export default function GamePage() {
   const [images, setImages] = useState<string[]>([]);
   const [isReady, setIsReady] = useState<boolean>(false);
   const pollingRef = useRef<NodeJS.Timer | null>(null);
+  //下記の行を追加。userNameAtomを使ってuserNameを取得可能
+  const [userName] = useAtom(userNameAtom);
 
   // ゲーム参加
   useEffect(() => {
@@ -82,6 +86,7 @@ export default function GamePage() {
 
   return (
     <div>
+      <p>Name: {userName}</p>
       <h1>Game: {gameId}</h1>
       <h2>Round: {round}</h2>
       {!isReady && (
