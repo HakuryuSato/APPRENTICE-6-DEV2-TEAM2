@@ -10,76 +10,81 @@ function getAllReady (users: UserStatus[]) {
 }
 
 function toPlayerList (users: UserStatus[]) {
-  return users.map(user => ({ id: user.uuid, ready: user.isReady }))
+  return users.map(user => ({ id: user.userId, ready: user.isReady }))
 }
 
 export async function handleGetGameState (req: NextRequest) {
   return handleExternalApiRequest(async () => {
     const { gameId } = (await req.json()) as GameStateRequest
-    const state = await getGameState(gameId)
-    if (!state) {
-      return NextResponse.json({ error: 'Game state not found' }, { status: 404 });
+    const gameState = await getGameState(gameId)
+    if (!gameState) {
+      return NextResponse.json(
+        { error: 'Game state not found' },
+        { status: 404 }
+      )
     }
     return NextResponse.json({
-      round: state.round,
-      users: toPlayerList(state.users),
-      allReady: getAllReady(state.users)
-    });
+      allReady: getAllReady(gameState.users)
+    })
   })
 }
 
 export async function handlePutGameState (req: NextRequest) {
   return handleExternalApiRequest(async () => {
-    const { action, gameId, playerId } = (await req.json()) as GameStateRequest & { playerId?: string }
 
-    if (!gameId) {
+    // 展開
+    const { gameId, gameStateRequestType, playerId } =
+      (await req.json()) as GameStateRequest & { playerId?: string }
+
+    // gameIdまたはgameStateRequestTypeがなければエラー
+    if (!gameId || !gameStateRequestType) {
       return NextResponse.json({ error: 'Missing gameId' }, { status: 400 })
     }
+    const gameState = await getGameState(gameId)
 
-    switch (action) {
+    // gameStateが存在しなければエラー
+    if (!gameState) {
+      return NextResponse.json(
+        { error: 'Game state not found' },
+        { status: 404 }
+      )
+    }
+
+    // RequestTypeに応じて処理
+    switch (gameStateRequestType) {
+      // ユーザーの追加
       case 'join': {
-        const state = await getGameState(gameId);
-    if (!state) {
-      return NextResponse.json({ error: 'Game state not found' }, { status: 404 });
-    }
-    if (playerId && !state.users.some(user => user.uuid === playerId)) {
-      state.users.push({ uuid: playerId, userName: '', isReady: false });
-      await putGameState(state);
-    }
-    return NextResponse.json({
-      round: state.round,
-      users: toPlayerList(state.users),
-      allReady: getAllReady(state.users)
-    });
+        // ユーザーidがなければエラー
+        if (!playerId){
+          return NextResponse.json(
+            { error: 'playerId not found' },
+            { status: 404 }
+          )
+        }
+
+        // 
+        if (playerId && !gameState.users.some(user => user.userId === playerId)) {
+          gameState.users.push({ userId: playerId, userName: '', isReady: false })
+          await putGameState(gameState)
+        }
+
+        return NextResponse.json({}, { status: 200 })
       }
+
+      // ユーザーの準備完了
       case 'ready': {
-        const state = await getGameState(gameId);
-    if (!state) {
-      return NextResponse.json({ error: 'Game state not found' }, { status: 404 });
-    }
-    if (playerId) {
-      const user = state.users.find(user => user.uuid === playerId);
-      if (user) {
-        user.isReady = true;
-        await putGameState(state);
-      }
-    }
-    return NextResponse.json({
-      round: state.round,
-      users: toPlayerList(state.users),
-      allReady: getAllReady(state.users)
-    });
-      }
-      case 'status' as string: {
-        const state = await getGameState(gameId)
-    if (!state) {
-      return NextResponse.json({ error: 'Game state not found' }, { status: 404 });
-    }
-    return NextResponse.json({
-      round: state.round,
-      users: toPlayerList(state.users),
-      allReady: getAllReady(state.users)
-    });
+        if (playerId) {
+          const user = gameState.users.find(user => user.userId === playerId)
+          if (user) {
+            user.isReady = true
+            await putGameState(gameState)
+          }
+        }
+        return NextResponse.json({
+          round: gameState.round,
+          users: toPlayerList(gameState.users),
+          allReady: getAllReady(gameState.users)
+        })
       }
 
       default:
