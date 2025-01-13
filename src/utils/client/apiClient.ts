@@ -6,7 +6,6 @@ response.dataからの展開はこの関数内で行い、展開後のデータ�
 import type { GenerateImageResponse } from "@/types/GenerateImage";
 import { TranslatePromptResponse } from "@/types/TranslatePrompt";
 import type { GameState, GameStateRequest } from "@/types/GameState";
-import { UserStatus } from "@/types/UserStatus";
 
 /**
  * 共通のAPI fetchエラーハンドリング関数
