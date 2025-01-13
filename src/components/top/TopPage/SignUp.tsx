@@ -2,9 +2,13 @@ import React from 'react';
 import { useSignUp } from '@/hooks/top/TopPage/useSignUp';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useAtom } from 'jotai';
+import { userNameAtom } from '@/atoms/state';
 
 export const SignUp: React.FC = () => {
-  const { inputText, setInputText, handleClickSubmit } = useSignUp();
+  const [userName, setUserName] = useAtom(userNameAtom);
+  console.log(userName); 
+  const { inputText, setInputText, handleClickSubmit } = useSignUp(setUserName);
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
@@ -17,6 +21,7 @@ export const SignUp: React.FC = () => {
         style={{ width: '300px' }}
       />
       <Button onClick={handleClickSubmit}>はじめる</Button>
+    
     </div>
   );
 };
