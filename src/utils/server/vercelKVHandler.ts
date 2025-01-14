@@ -48,7 +48,7 @@ async function kvDel (key: string): Promise<void> {
 
 
 export {
-  kvWrite,
-  kvRead,
-  kvDelete
+  kvGet,
+  kvSet,
+  kvDel
 }
