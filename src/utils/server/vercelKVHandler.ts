@@ -1,13 +1,9 @@
 // VercelKV用の関数群
-
 import { Redis } from '@upstash/redis' 
 import type { GameState } from '@/types/GameState'
 
 // VercelKVはVercel上でRedisを使用します
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!
-})
+const redis = Redis.fromEnv();
 
 /**
  * VercelKVから値を取得する関数
