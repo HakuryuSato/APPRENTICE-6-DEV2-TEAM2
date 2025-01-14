@@ -3,7 +3,7 @@
 response.dataからの展開はこの関数内で行い、展開後のデータをクライアントサイドへ返している。
 */
 
-import type { GenerateImageResponse } from '@/types/GenerateImage'
+import type { GenerateImageRequest, GenerateImageResponse } from '@/types/GenerateImage'
 import { TranslatePromptResponse } from '@/types/TranslatePrompt'
 import type { GameState, GameStateRequest } from '@/types/GameState'
 
@@ -40,12 +40,12 @@ async function handleFetchApi<T> (
 
 // プロンプトから画像生成 -------------------------------------------------
 export async function fetchGenerateImage (
-  prompt: string
+  request: GenerateImageRequest
 ): Promise<GenerateImageResponse | null> {
   return await handleFetchApi<GenerateImageResponse>('/api/generate-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify(request)
   })
 }
 
