@@ -11,7 +11,7 @@ async function handleKvOperation (
   try {
     switch (operation) {
       case 'get':
-        const json = (await kv.get(key)) ?? null
+        const json: string = (await kv.get(key)) ?? ''
         if (json) {
           obj = JSON.parse(json)
         }
