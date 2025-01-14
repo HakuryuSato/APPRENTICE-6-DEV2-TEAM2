@@ -3,9 +3,9 @@
 response.dataからの展開はこの関数内で行い、展開後のデータをクライアントサイドへ返している。
 */
 
-import type { GenerateImageResponse } from '@/types/GenerateImage';
-import { TranslatePromptResponse } from '@/types/TranslatePrompt';
-import type { GameState, GameStateRequest } from '@/types/GameState';
+import type { GenerateImageResponse } from '@/types/GenerateImage'
+import { TranslatePromptResponse } from '@/types/TranslatePrompt'
+import type { GameState, GameStateRequest } from '@/types/GameState'
 
 /**
  * 共通のAPI fetchエラーハンドリング関数
@@ -17,40 +17,40 @@ import type { GameState, GameStateRequest } from '@/types/GameState';
  * @returns {Promise<T>} - レスポンスから抽出されたデータを型Tを含むPromiseとして返す
  * @throws {Error} - フェッチ処理中にエラーが発生した場合の処理
  */
-async function handleFetchApi<T>(
+async function handleFetchApi<T> (
   url: string,
   options?: RequestInit
 ): Promise<T> {
   try {
-    const response = await fetch(url, options);
-    const result = await response.json();
+    const response = await fetch(url, options)
+    const result = await response.json()
 
     if (response.ok && result && 'data' in result) {
-      console.log('apiClient:', result.data);
-      return result.data as T;
+      console.log('apiClient:', result.data)
+      return result.data as T
     } else {
-      console.error(`Error fetching ${url}:`, result);
-      return [] as unknown as T;
+      console.error(`Error fetching ${url}:`, result)
+      return [] as unknown as T
     }
   } catch (error) {
-    console.error('An error occurred:', error);
-    return [] as unknown as T;
+    console.error('An error occurred:', error)
+    return [] as unknown as T
   }
 }
 
 // プロンプトから画像生成 -------------------------------------------------
-export async function fetchGenerateImage(
+export async function fetchGenerateImage (
   prompt: string
 ): Promise<GenerateImageResponse | null> {
   return await handleFetchApi<GenerateImageResponse>('/api/generate-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
-  });
+    body: JSON.stringify({ prompt })
+  })
 }
 
 // プロンプトを英語に翻訳 --------------------------------------------------
-export async function fetchTranslatePrompt(
+export async function fetchTranslatePrompt (
   prompt: string
 ): Promise<TranslatePromptResponse | null> {
   return await handleFetchApi<TranslatePromptResponse>(
@@ -58,33 +58,49 @@ export async function fetchTranslatePrompt(
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: prompt, targetLang: 'en-GB' }),
+      body: JSON.stringify({ text: prompt, targetLang: 'en-GB' })
     }
-  );
+  )
 }
 
 // ゲーム状態を取得 -------------------------------------------------
-export async function fetchGameState(gameId: string): Promise<GameState | null> {
-  return await handleFetchApi<GameState>(`/api/game-state?gameId=${encodeURIComponent(gameId)}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
+export async function fetchGameState (
+  gameId: string
+): Promise<GameState | null> {
+  return await handleFetchApi<GameState>(
+    `/api/game-state?gameId=${encodeURIComponent(gameId)}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
 }
 
 // ゲーム状態を更新 -------------------------------------------------
-export async function updateGameState({
+export async function updateGameState ({
   gameId,
   gameStateRequestType,
-  userStatus,
-}: GameStateRequest): Promise<void> {
+  userStatus
+}: GameStateRequest): Promise<GameState | null> {
   const gameStateRequest = {
     gameId,
     gameStateRequestType,
-    userStatus,
-  };
-  await handleFetchApi<void>(`/api/game-state`, {
+    userStatus
+  }
+  return await handleFetchApi<GameState | null>(`/api/game-state`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(gameStateRequest),
-  });
+    body: JSON.stringify(gameStateRequest)
+  })
+}
+
+// ゲーム状態を削除 -------------------------------------------------
+export async function deleteGameState (gameId: string): Promise<void> {
+  return await handleFetchApi<void>(
+    `/api/game-state?gameId=${encodeURIComponent(gameId)}`,
+    {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
 }
