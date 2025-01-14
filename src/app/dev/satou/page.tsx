@@ -15,7 +15,6 @@ export default function DevSatouPage() {
   // Fetch
   const handleFetch = async () => {
     const data = await fetchGameState(testGameId)
-    console.log('Fetched:', data)
     setGameState(data)
   }
 
