@@ -81,13 +81,13 @@ export async function updateGameState ({
   gameId,
   gameStateRequestType,
   userStatus
-}: GameStateRequest): Promise<void> {
+}: GameStateRequest): Promise<GameState | null> {
   const gameStateRequest = {
     gameId,
     gameStateRequestType,
     userStatus
   }
-  await handleFetchApi<void>(`/api/game-state`, {
+  return await handleFetchApi<GameState | null>(`/api/game-state`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(gameStateRequest)
@@ -95,9 +95,7 @@ export async function updateGameState ({
 }
 
 // ゲーム状態を削除 -------------------------------------------------
-export async function deleteGameState (
-  gameId: string
-): Promise<void> {
+export async function deleteGameState (gameId: string): Promise<void> {
   return await handleFetchApi<void>(
     `/api/game-state?gameId=${encodeURIComponent(gameId)}`,
     {
