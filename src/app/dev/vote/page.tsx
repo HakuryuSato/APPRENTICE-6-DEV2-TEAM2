@@ -1,7 +1,7 @@
 'use client';
 
-import { VoteContainer } from '@/components/game/GamePage/VoteContainer';
+import { GeneratedImageContainer } from '@/components/game/GamePage/GeneratedImageContainer';
 
 export default function VotePage() {
-  return <VoteContainer />;
+  return <GeneratedImageContainer />;
 }
