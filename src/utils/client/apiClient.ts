@@ -39,6 +39,7 @@ async function handleFetchApi<T> (
 }
 
 // プロンプトから画像生成 -------------------------------------------------
+// ここでgameStateを引数として受け取るよう修正
 export async function fetchGenerateImage (
   prompt: string
 ): Promise<GenerateImageResponse | null> {
