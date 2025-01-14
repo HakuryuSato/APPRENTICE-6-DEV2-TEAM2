@@ -84,8 +84,6 @@ export const Create: React.FC = () => {
         <Button className="bg-slate-500" onClick={handleClickBack}>戻る</Button>
       </div>
     </div>
-
-
   );
 };
 
