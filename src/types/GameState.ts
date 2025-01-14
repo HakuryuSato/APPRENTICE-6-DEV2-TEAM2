@@ -9,6 +9,11 @@ export interface GameState {
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
+
+  // ユーザーごとの画像リスト
+  images :{
+    [userId:string] :string[]
+  }
 }
 
 export interface GameStateRequest {
