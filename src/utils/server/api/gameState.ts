@@ -23,14 +23,20 @@ function getAllReady(users: UserStatus[]) {
 
 // GameStateを取得する関数
 export async function handleGetGameState(req: NextRequest) {
-  return handleExternalApiRequest(async () => {
-    const { gameId } = (await req.json()) as GameStateRequest;
-    const gameState = await getGameState(gameId);
+  const { searchParams } = new URL(req.url);
+  const gameId = searchParams.get("gameId");
 
-    return NextResponse.json({
-      gameState,
-    });
-  });
+  if (!gameId) {
+    return respondWithError("Missing gameId", 400);
+  }
+
+  const gameState = await getGameState(gameId);
+
+  if (!gameState) {
+    return respondWithError("Game state not found", 404);
+  }
+
+  return NextResponse.json(gameState, { status: 200 });
 }
 
 // GameStateを作成・更新する関数

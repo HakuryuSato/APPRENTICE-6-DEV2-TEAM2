@@ -8,23 +8,28 @@ export const Select: React.FC = () => {
   const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] =
     useAtom(topPageModeAtom); // グローバルステートから取得
 
-  const handleClickSubmit = () => {
-    setTemporaryTopPageLayoutMode({ mode: 'create' });
-  };
+
+    const handleClickCreate = () => {
+        setTemporaryTopPageLayoutMode({ mode: 'create' });
+    }
+    const handleClickEnter = () => {
+        setTemporaryTopPageLayoutMode({ mode: 'enter' });
+    }
+    const handleClickBack = () => {
+      setTemporaryTopPageLayoutMode({ mode: 'sign-up' });
+    }
+
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '16px',
-      }}
-    >
+    <div className="flex flex-col items-center gap-4">
       <h1>現在は {temporaryTopPageLayoutMode.mode}モードです。</h1>
       <p>ニックネーム: {userName}</p>
-      <p>ルームを作る or ルームに入る</p>
-      <Button onClick={handleClickSubmit}>はじめる</Button>
+
+      <div className="flex gap-4">
+        <Button onClick={handleClickCreate}>ルームを作る</Button>
+        <Button onClick={handleClickEnter}>ルームに入る</Button>
+      </div>
+      <Button className="bg-slate-500" onClick={handleClickBack}>戻る</Button>
     </div>
   );
 };
