@@ -97,8 +97,8 @@ export async function updateGameState ({
 // ゲーム状態を削除 -------------------------------------------------
 export async function deleteGameState (
   gameId: string
-): Promise<GameState | null> {
-  return await handleFetchApi<GameState>(
+): Promise<void> {
+  return await handleFetchApi<void>(
     `/api/game-state?gameId=${encodeURIComponent(gameId)}`,
     {
       method: 'DELETE',
