@@ -1,9 +1,9 @@
-import React from "react";
-import Image from "next/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { GeneratedImageProps } from "@/types/GenerateImage";
+import React from 'react';
+import Image from 'next/image';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { GenerateImageResponse } from '@/types/GenerateImage';
 
-export const GeneratedImage: React.FC<GeneratedImageProps> = ({ imageUrl }) => {
+export const GeneratedImage: React.FC<GenerateImageResponse> = ({ url }) => {
   return (
     <div className="w-full">
       {/* ratioで画像の比率を変えられます
@@ -11,7 +11,7 @@ export const GeneratedImage: React.FC<GeneratedImageProps> = ({ imageUrl }) => {
       */}
       <AspectRatio ratio={4 / 3}>
         <Image
-          src={imageUrl}
+          src={url}
           alt="Generated Image"
           className="rounded-md object-cover"
           fill
