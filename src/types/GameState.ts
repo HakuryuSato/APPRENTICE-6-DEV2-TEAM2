@@ -15,7 +15,7 @@ export interface GameState {
     imageUrl: Pick<GenerateImageResponse, 'url'>;
     generateUserId: Pick<UserStatus, 'userId'>;
     generatedRound: number;
-  };
+  }[];
 }
 
 export interface GameStateRequest {
