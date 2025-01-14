@@ -39,7 +39,8 @@ export async function handleGetGameState (req: NextRequest) {
   if (!gameState) {
     gameState = null
   }
-  return NextResponse.json({ data: gameState }, { status: 200 })
+
+  return gameState
 }
 
 // POST  -------------------------------------------------
