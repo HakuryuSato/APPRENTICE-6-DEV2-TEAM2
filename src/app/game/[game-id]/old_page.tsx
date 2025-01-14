@@ -1,11 +1,11 @@
 // app/game/[game-uuid]/page.tsx
-"use client";
+'use client';
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
-import { useAtom } from 'jotai'
+import { useAtom } from 'jotai';
 import { userNameAtom } from '@/atoms/state';
 
 export default function OldGamePage() {
@@ -25,7 +25,7 @@ export default function OldGamePage() {
     fetch('/api/gameState', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'join', gameId, playerId })
+      body: JSON.stringify({ action: 'join', gameId, playerId }),
     });
   }, [gameId, playerId]);
 
@@ -36,16 +36,17 @@ export default function OldGamePage() {
         const res = await fetch('/api/gameState', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'status', gameId })
+          body: JSON.stringify({ action: 'status', gameId }),
         });
         const data = await res.json();
         setRound(data.round);
         setAllReady(data.allReady);
         setImages(data.images || []);
       }, 1000);
-  
+
       return () => {
-        if (pollingRef.current) clearInterval(pollingRef.current as NodeJS.Timeout); // 型アサーションを追加
+        if (pollingRef.current)
+          clearInterval(pollingRef.current as NodeJS.Timeout); // 型アサーションを追加
       };
     }
   }, [isReady, allReady, gameId]);
@@ -54,7 +55,7 @@ export default function OldGamePage() {
     const res = await fetch('/api/gameState', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'ready', gameId, playerId })
+      body: JSON.stringify({ action: 'ready', gameId, playerId }),
     });
     const data = await res.json();
     setAllReady(data.allReady);
@@ -65,7 +66,7 @@ export default function OldGamePage() {
     const res = await fetch('/api/gameState', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'generateImage', gameId })
+      body: JSON.stringify({ action: 'generateImage', gameId }),
     });
     const data = await res.json();
     setImages(data.images || []);
@@ -75,7 +76,7 @@ export default function OldGamePage() {
     const res = await fetch('/api/gameState', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'nextRound', gameId })
+      body: JSON.stringify({ action: 'nextRound', gameId }),
     });
     const data = await res.json();
     setRound(data.round);
@@ -89,15 +90,18 @@ export default function OldGamePage() {
       <p>Name: {userName}</p>
       <h1>Game: {gameId}</h1>
       <h2>Round: {round}</h2>
-      {!isReady && (
-        <Button onClick={handleReady}>準備完了</Button>
-      )}
+      {!isReady && <Button onClick={handleReady}>準備完了</Button>}
       {allReady && (
         <div>
           <p>全員準備完了！ラウンド開始</p>
           {images[round - 1] ? (
             <div>
-              <img src={images[round - 1]} alt="Generated" width={256} height={256}/>
+              <img
+                src={images[round - 1]}
+                alt="Generated"
+                width={256}
+                height={256}
+              />
               <Button onClick={handleNextRound}>次のラウンドへ</Button>
             </div>
           ) : (

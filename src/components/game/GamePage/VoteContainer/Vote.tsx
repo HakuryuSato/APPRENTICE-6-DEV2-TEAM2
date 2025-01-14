@@ -1,7 +1,5 @@
 export const Vote: React.FC = () => {
-  return (
-    <>
-      {/* コンポーネントの内容をここに追加 */}
-    </>
-  );
+  return <>
+  <h1>loop</h1>
+  </>;
 };

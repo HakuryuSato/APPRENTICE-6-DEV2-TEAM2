@@ -2,10 +2,10 @@ import { topPageModeAtom } from '@/atoms/state';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 
-
 export const useSignUp = (setUserName: (name: string) => void) => {
   const [inputText, setInputText] = useState('');
-  const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得]
+  const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] =
+    useAtom(topPageModeAtom); // グローバルステートから取得]
 
   const handleClickSubmit = () => {
     if (inputText.trim() !== '') {
