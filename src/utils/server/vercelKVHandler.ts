@@ -10,12 +10,18 @@ async function handleKvOperation (
 ): Promise<object | void | null> {
   try {
     switch (operation) {
-      case 'get':
-        const json: string = (await kv.get(key)) ?? ''
-        if (json) {
-          obj = JSON.parse(json)
+      case 'get': {
+        const json = (await kv.get(key)) ?? null
+        try {
+          if (typeof json === 'string') {
+            return JSON.parse(json as string)
+          }
+          return json
+        } catch (e) {
+          console.error('JSON.parseエラー:', e)
+          return null
         }
-        return obj ?? null
+      }
       case 'set':
         // 今回はオブジェクト以外格納予定がないためvalueは''
         if (obj) {
@@ -39,7 +45,7 @@ async function handleKvOperation (
 
 // 読み取り
 async function kvGet (key: string): Promise<GameState | null> {
-  return (await handleKvOperation('get', key)) as GameState | null
+  return await handleKvOperation('get', key) as GameState | null
 }
 
 // 書き込み *値があれば上書き
