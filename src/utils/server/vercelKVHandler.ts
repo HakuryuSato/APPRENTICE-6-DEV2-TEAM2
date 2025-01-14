@@ -32,17 +32,17 @@ async function handleKvOperation (
 }
 
 // 読み取り
-async function kvRead (key: string): Promise<object | null> {
+async function kvGet (key: string): Promise<object | null> {
   return (await handleKvOperation('get', key)) as object | null
 }
 
-// 書き込み
-async function kvWrite (key: string, obj: object): Promise<void> {
+// 書き込み *値があれば上書き
+async function kvSet (key: string, obj: object): Promise<void> {
   await handleKvOperation('set', key, obj)
 }
 
 // 削除
-async function kvDelete (key: string): Promise<void> {
+async function kvDel (key: string): Promise<void> {
   await handleKvOperation('del', key)
 }
 
