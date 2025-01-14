@@ -32,32 +32,41 @@ export const Create: React.FC = () => {
       setErrorText('任意のゲームIDを入力してください。');
       return;
     }
-    const gameState = await fetchGameState(inputText.trim());
 
-    if (gameState !== null) {
+    try {
+      const gameState = await fetchGameState(inputText.trim());
+      if (gameState !== null) {
+        setErrorText(
+          `${inputText.trim()}は使用中です。別の合言葉を作成してください。`
+        );
+        return;
+      }
+
+      const userStatus: UserStatus = {
+        userId: userId,
+        userName: userName,
+        isReady: false,
+      };
+
+      const response = await updateGameState({
+        gameId: inputText.trim(),
+        gameStateRequestType: 'create',
+        userStatus,
+      });
+
+      if (response) {
+        setGameId(inputText.trim());
+        router.push(`/game/${inputText.trim()}`);
+      } else {
+        setErrorText('ゲームの作成に失敗しました。もう一度お試しください。');
+      }
+    } catch (error) {
+      console.error('エラー:', error);
       setErrorText(
-        `${inputText.trim()}は使用中です。別の合言葉を作成してください。`
+        error instanceof Error
+          ? `エラーが発生しました: ${error.message}`
+          : '不明なエラーが発生しました。もう一度お試しください。'
       );
-      return;
-    }
-
-    const userStatus: UserStatus = {
-      userId: userId,
-      userName: userName,
-      isReady: false,
-    };
-
-    const response = await updateGameState({
-      gameId: inputText.trim(),
-      gameStateRequestType: 'create',
-      userStatus,
-    });
-
-    if (response) {
-      setGameId(inputText.trim());
-      router.push(`/game/${gameId}`);
-    } else {
-      setErrorText('ゲームの作成に失敗しました。もう一度お試しください。');
     }
   };
 
