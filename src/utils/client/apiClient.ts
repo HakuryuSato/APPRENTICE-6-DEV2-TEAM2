@@ -65,10 +65,9 @@ export async function fetchTranslatePrompt(
 
 // ゲーム状態を取得 -------------------------------------------------
 export async function fetchGameState(gameId: string): Promise<GameState | null> {
-  return await handleFetchApi<GameState>(`/api/game-state`, {
+  return await handleFetchApi<GameState>(`/api/game-state?gameId=${encodeURIComponent(gameId)}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ gameId }),
   });
 }
 
