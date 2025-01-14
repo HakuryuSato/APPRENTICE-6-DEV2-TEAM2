@@ -58,10 +58,10 @@ export default function DevSatouPage() {
   return (
     <div style={{ padding: '1rem' }}>
       <button onClick={handleFetch}>取得</button>
-      <button onClick={handleCreate} style={{ marginLeft: '0.5rem' }}>作成</button>
-      <button onClick={handleEnter} style={{ marginLeft: '0.5rem' }}>入室</button>
-      <button onClick={handleReady} style={{ marginLeft: '0.5rem' }}>準備完了解除</button>
-      <button onClick={handleDelete} style={{ marginLeft: '0.5rem' }}>削除</button>
+      <button onClick={handleCreate} style={{ marginLeft: '0.5rem' }}>ユーザーaで部屋を作成</button>
+      <button onClick={handleEnter} style={{ marginLeft: '0.5rem' }}>ユーザーbを入室</button>
+      <button onClick={handleReady} style={{ marginLeft: '0.5rem' }}>ユーザーbの準備完了を解除</button>
+      <button onClick={handleDelete} style={{ marginLeft: '0.5rem' }}>部屋を削除</button>
 
       {/* Fetch結果を表示（無ければ 'なし'） */}
       <div style={{ marginTop: '1rem' }}>
