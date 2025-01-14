@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAtom } from "jotai";
-import { gameIdAtom, topPageModeAtom, userIdAtom, userNameAtom } from "@/atoms/state";
+import { gameIdAtom, topPageModeAtom, userNameAtom } from "@/atoms/state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -12,8 +12,8 @@ import { useRouter } from 'next/navigation';
 export const Create: React.FC = () => {
     const router = useRouter();
     const [userName] = useAtom(userNameAtom);
-    const [userId, setUserId] =useAtom(userIdAtom)
-    const [gameId, setGameId] = useAtom(gameIdAtom);
+    // const [userId, setUserId] =useAtom(userIdAtom)
+    const [,setGameId] = useAtom(gameIdAtom);
     const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得
     
     const [inputText, setInputText] = useState('')
