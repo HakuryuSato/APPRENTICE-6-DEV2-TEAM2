@@ -11,11 +11,16 @@ async function handleKvOperation (
   try {
     switch (operation) {
       case 'get':
-        return (await kv.get(key)) ?? null
+        const json = (await kv.get(key)) ?? null
+        if (json) {
+          obj = JSON.parse(json)
+        }
+        return obj ?? null
       case 'set':
         // 今回はオブジェクト以外格納予定がないためvalueは''
         if (obj) {
-          await kv.set(key, '', obj)
+          const json = JSON.stringify(obj)
+          await kv.set(key, json)
         } else {
           throw new Error('Missing object for "set" operation')
         }
@@ -47,9 +52,4 @@ async function kvDel (key: string): Promise<void> {
   await handleKvOperation('del', key)
 }
 
-
-export {
-  kvGet,
-  kvSet,
-  kvDel
-}
+export { kvGet, kvSet, kvDel }
