@@ -18,16 +18,36 @@ export default function DevSatouPage() {
     setGameState(data)
   }
 
-  // Update
-  const handleUpdate = async () => {
+
+  // Create,Enterは自動でuserStatusのisReadyをtrueにします
+  // Create
+  const handleCreate = async () => {
     // 例として、"create" で新規 GameState を作成
     await updateGameState({
       gameId: testGameId,
       gameStateRequestType: 'create',
-      userStatus: { userId: '', userName: '', isReady: false }
+      userStatus: { userId: '1', userName: 'a', isReady: false }
     })
-    console.log('Updated (created).')
   }
+
+    // Enter 
+    const handleEnter = async () => {
+      await updateGameState({
+        gameId: testGameId,
+        gameStateRequestType: 'enter',
+        userStatus: { userId: '2', userName: 'b', isReady: false } 
+      })
+    }
+
+    // Ready
+    const handleReady = async () => {
+      await updateGameState({
+        gameId: testGameId,
+        gameStateRequestType: 'ready',
+        userStatus: { userId: '2', userName: 'b', isReady: false }
+      })
+    }
+
 
   // Delete
   const handleDelete = async () => {
@@ -38,7 +58,9 @@ export default function DevSatouPage() {
   return (
     <div style={{ padding: '1rem' }}>
       <button onClick={handleFetch}>取得</button>
-      <button onClick={handleUpdate} style={{ marginLeft: '0.5rem' }}>更新</button>
+      <button onClick={handleCreate} style={{ marginLeft: '0.5rem' }}>作成</button>
+      <button onClick={handleEnter} style={{ marginLeft: '0.5rem' }}>入室</button>
+      <button onClick={handleReady} style={{ marginLeft: '0.5rem' }}>準備完了解除</button>
       <button onClick={handleDelete} style={{ marginLeft: '0.5rem' }}>削除</button>
 
       {/* Fetch結果を表示（無ければ 'なし'） */}
