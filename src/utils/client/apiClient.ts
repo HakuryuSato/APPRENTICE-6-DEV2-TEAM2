@@ -55,6 +55,7 @@ export async function fetchTranslatePrompt (
 ): Promise<TranslatePromptResponse | null> {
   return await handleFetchApi<TranslatePromptResponse>(
     '/api/translate-prompt',
+    '/api/translate-prompt',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
