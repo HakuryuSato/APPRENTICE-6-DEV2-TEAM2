@@ -1,4 +1,5 @@
 import { kv } from '@vercel/kv'
+import type { GameState } from '@/types/GameState'
 
 // VercelKV関連の関数群  -------------------------------------------------
 // 共通関数
@@ -32,8 +33,8 @@ async function handleKvOperation (
 }
 
 // 読み取り
-async function kvGet (key: string): Promise<object | null> {
-  return (await handleKvOperation('get', key)) as object | null
+async function kvGet (key: string): Promise<GameState | null> {
+  return (await handleKvOperation('get', key)) as GameState | null
 }
 
 // 書き込み *値があれば上書き
