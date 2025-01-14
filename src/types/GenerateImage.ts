@@ -7,3 +7,7 @@ export interface GenerateImageRequest {
 export interface GenerateImageResponse {
   url: string;
 }
+
+export interface GeneratedImageProps {
+  imageUrl: string;
+}
