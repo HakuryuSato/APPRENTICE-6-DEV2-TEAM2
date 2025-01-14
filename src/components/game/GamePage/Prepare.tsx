@@ -1,8 +1,4 @@
 export const Prepare: React.FC = () => {
   // ここでGlobalStateのgameId,userIdを呼び出し、apiへのPoling時に使用する。
-  return (
-    <>
-      {/* コンポーネントの内容をここに追加 */}
-    </>
-  );
+  return <><h1 className='font-semibold text-2xl'>Prepare</h1></>;
 };

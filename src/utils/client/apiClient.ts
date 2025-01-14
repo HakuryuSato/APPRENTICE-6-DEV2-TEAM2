@@ -3,9 +3,9 @@
 response.dataからの展開はこの関数内で行い、展開後のデータをクライアントサイドへ返している。
 */
 
-import type { GenerateImageResponse } from "@/types/GenerateImage";
-import { TranslatePromptResponse } from "@/types/TranslatePrompt";
-import type { GameState, GameStateRequest } from "@/types/GameState";
+import type { GenerateImageResponse } from '@/types/GenerateImage';
+import { TranslatePromptResponse } from '@/types/TranslatePrompt';
+import type { GameState, GameStateRequest } from '@/types/GameState';
 
 /**
  * 共通のAPI fetchエラーハンドリング関数
@@ -25,15 +25,15 @@ async function handleFetchApi<T>(
     const response = await fetch(url, options);
     const result = await response.json();
 
-    if (response.ok && result && "data" in result) {
-      console.log("apiClient:", result.data);
+    if (response.ok && result && 'data' in result) {
+      console.log('apiClient:', result.data);
       return result.data as T;
     } else {
       console.error(`Error fetching ${url}:`, result);
       return [] as unknown as T;
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error('An error occurred:', error);
     return [] as unknown as T;
   }
 }
@@ -42,9 +42,9 @@ async function handleFetchApi<T>(
 export async function fetchGenerateImage(
   prompt: string
 ): Promise<GenerateImageResponse | null> {
-  return await handleFetchApi<GenerateImageResponse>("/api/generate-image", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  return await handleFetchApi<GenerateImageResponse>('/api/generate-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
   });
 }
@@ -54,20 +54,22 @@ export async function fetchTranslatePrompt(
   prompt: string
 ): Promise<TranslatePromptResponse | null> {
   return await handleFetchApi<TranslatePromptResponse>(
-    "/api/translate-prompt",
+    '/api/translate-prompt',
     {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: prompt, targetLang: "en-GB" }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: prompt, targetLang: 'en-GB' }),
     }
   );
 }
 
 // ゲーム状態を取得 -------------------------------------------------
-export async function fetchGameState(gameId: string): Promise<GameState | null> {
+export async function fetchGameState(
+  gameId: string
+): Promise<GameState | null> {
   return await handleFetchApi<GameState>(`/api/game-state`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ gameId }),
   });
 }
@@ -81,12 +83,11 @@ export async function updateGameState({
   const gameStateRequest = {
     gameId,
     gameStateRequestType,
-    userStatus
-  }
+    userStatus,
+  };
   await handleFetchApi<void>(`/api/game-state`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(gameStateRequest),
   });
 }
-

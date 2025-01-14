@@ -1,13 +1,13 @@
 // VercelKV用の関数群
 
-import { Redis } from '@upstash/redis' 
-import type { GameState } from '@/types/GameState'
+import { Redis } from '@upstash/redis';
+import type { GameState } from '@/types/GameState';
 
 // VercelKVはVercel上でRedisを使用します
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!
-})
+  token: process.env.KV_REST_API_TOKEN!,
+});
 
 /**
  * VercelKVから値を取得する関数
@@ -35,11 +35,10 @@ async function writeVercelKV(key: string, value: object): Promise<void> {
   }
 }
 
-
 // GameStateを取得する関数
 // gameIdを引数としGameStateまたはnullを返す
 async function getGameState(gameId: string): Promise<GameState | null> {
-  return await readVercelKV(gameId) as GameState | null;
+  return (await readVercelKV(gameId)) as GameState | null;
 }
 
 // GameStateを作成または更新する関数

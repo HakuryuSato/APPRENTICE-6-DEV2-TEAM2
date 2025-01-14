@@ -1,5 +1,5 @@
 export interface UserStatus {
-  userId: string // uuid
-  userName: string
-  isReady: boolean
+  userId: string; // uuid
+  userName: string;
+  isReady: boolean;
 }
