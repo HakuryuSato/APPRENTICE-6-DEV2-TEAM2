@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { GameState, GameStateRequest } from '@/types/GameState'
 import type { UserStatus } from '@/types/UserStatus'
-import { getGameState, putGameState } from '@/utils/server/vercelKVStore'
+import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler'
 import { handleExternalApiRequest } from '@/utils/server/handleExternalApiRequest'
 
+// 汎用関数  ---------------------------------------------------------------------------------------------------
 // GameState更新用共通関数
-async function handleUpdateGameState (gameState: GameState) {
-  await putGameState(gameState)
+async function handleSetGameState (gameState: GameState) {
+  await kvSet(gameState.gameId, gameState)
   return NextResponse.json({}, { status: 200 })
 }
 
@@ -21,26 +22,27 @@ function getAllReady (users: UserStatus[]) {
   return users.every(user => user.isReady)
 }
 
-// GameStateを取得する関数
-export async function handleGetGameState(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const gameId = searchParams.get("gameId");
+// 各メソッド用関数 ---------------------------------------------------------------------------------------------------
+// GET  -------------------------------------------------
+export async function handleGetGameState (req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const gameId = searchParams.get('gameId')
 
   if (!gameId) {
-    return respondWithError("Missing gameId", 400);
+    return respondWithError('Missing gameId', 400)
   }
 
-  const gameState = await getGameState(gameId);
+  const gameState = await kvGet(gameId)
 
   if (!gameState) {
-    return respondWithError("Game state not found", 404);
+    return respondWithError('Game state not found', 404)
   }
 
-  return NextResponse.json(gameState, { status: 200 });
+  return NextResponse.json(gameState, { status: 200 })
 }
 
-// GameStateを作成・更新する関数
-export async function handlePutGameState (req: NextRequest) {
+// POST  -------------------------------------------------
+export async function handlePOSTGameState (req: NextRequest) {
   return handleExternalApiRequest(async () => {
     // 展開
     const { gameId, gameStateRequestType, userStatus } =
@@ -52,14 +54,14 @@ export async function handlePutGameState (req: NextRequest) {
     }
 
     // gameStateの取得
-    const gameState = await getGameState(gameId)
+    const gameState = await kvGet(gameId)
 
     // gameStateが存在しなければエラー
     if (!gameState) {
       return respondWithError('Game state not found', 404)
     }
 
-    // RequestTypeに応じて処理 -------------------------------------------------
+    // RequestTypeに応じて処理
     switch (gameStateRequestType) {
       case 'create': {
         // 新たなGameStateの作成
@@ -67,7 +69,7 @@ export async function handlePutGameState (req: NextRequest) {
           gameId: gameId
         } as GameState
 
-        await handleUpdateGameState(gameState)
+        await handleSetGameState(gameState)
         break
       }
 
@@ -84,7 +86,7 @@ export async function handlePutGameState (req: NextRequest) {
           isReady: true
         })
 
-        await handleUpdateGameState(gameState)
+        await handleSetGameState(gameState)
         break
       }
 
@@ -97,7 +99,7 @@ export async function handlePutGameState (req: NextRequest) {
           if (user) {
             user.isReady = true
             gameState.isAllUsersReady = getAllReady(gameState.users) // フラグ更新
-            await handleUpdateGameState(gameState)
+            await handleSetGameState(gameState)
           }
         }
 
@@ -108,4 +110,17 @@ export async function handlePutGameState (req: NextRequest) {
         return respondWithError('Unknown action', 400)
     }
   })
+}
+
+// 削除 -------------------------------------------------
+export async function handleDeleteGameState (req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const gameId = searchParams.get('gameId')
+
+  if (!gameId) {
+    return respondWithError('Missing gameId', 400)
+  }
+
+  const gameState = await kvDel(gameId)
+  return NextResponse.json(gameState, { status: 200 })
 }
