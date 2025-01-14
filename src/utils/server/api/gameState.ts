@@ -17,8 +17,6 @@ function respondWithError(errorMessage: string, statusCode: number) {
 // 全ユーザーが準備完了済みか判定する関数
 function getAllReady(users: UserStatus[]) {
   if (users.length === 0) return false;
-function getAllReady(users: UserStatus[]) {
-  if (users.length === 0) return false;
   return users.every((user) => user.isReady);
 }
 
