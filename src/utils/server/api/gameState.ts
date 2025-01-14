@@ -28,16 +28,17 @@ export async function handleGetGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const gameId = searchParams.get('gameId')
 
+  // gameIdが存在しなければエラー
   if (!gameId) {
     return respondWithError('Missing gameId', 400)
   }
 
-  const gameState = await kvGet(gameId)
+  let gameState = await kvGet(gameId)
 
+  // gameStateが存在すればgameStateを、存在しなければnullを返す
   if (!gameState) {
-    return respondWithError('Game state not found', 404)
+    gameState = null
   }
-
   return NextResponse.json(gameState, { status: 200 })
 }
 
@@ -54,27 +55,36 @@ export async function handlePOSTGameState (req: NextRequest) {
     }
 
     // gameStateの取得
-    const gameState = await kvGet(gameId)
-
-    // gameStateが存在しなければエラー
-    if (!gameState) {
-      return respondWithError('Game state not found', 404)
-    }
+    let gameState = (await kvGet(gameId)) as GameState
 
     // RequestTypeに応じて処理
     switch (gameStateRequestType) {
+      // 作成
       case 'create': {
-        // 新たなGameStateの作成
-        const gameState = {
-          gameId: gameId
+        // 既にgameStateが存在するならばエラー
+        if (gameState) return respondWithError('Already Exists', 409)
+
+        gameState = {
+          gameId: gameId,
+          gamePhase: 'prepare',
+          round: 0,
+          users: [
+            // 部屋作成者を追加
+            {
+              userId: userStatus.userId,
+              userName: userStatus.userName,
+              isReady: true
+            }
+          ],
+          isAllUsersReady: false
         } as GameState
 
-        await handleSetGameState(gameState)
+        await kvSet(gameId, gameState)
         break
       }
 
+      // ユーザーの追加
       case 'enter': {
-        // ユーザーの追加
         // userIdまたはuserNameがなければエラー
         if (!userStatus.userId || !userStatus.userName) {
           return respondWithError('playerId not found', 404)
@@ -97,8 +107,9 @@ export async function handlePOSTGameState (req: NextRequest) {
             user => user.userId === userStatus.userId
           )
           if (user) {
+            // 参照渡し
             user.isReady = true
-            gameState.isAllUsersReady = getAllReady(gameState.users) // フラグ更新
+            gameState.isAllUsersReady = getAllReady(gameState.users)
             await handleSetGameState(gameState)
           }
         }
@@ -112,7 +123,7 @@ export async function handlePOSTGameState (req: NextRequest) {
   })
 }
 
-// 削除 -------------------------------------------------
+// DELETE -------------------------------------------------
 export async function handleDeleteGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const gameId = searchParams.get('gameId')
