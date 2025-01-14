@@ -1,11 +1,11 @@
-import { TargetLanguageCode, Translator } from "deepl-node";
+import { TargetLanguageCode, Translator } from 'deepl-node';
 
 // DeepL APIを用いて翻訳を行う関数
 export async function translatePrompt(
   text: string,
   targetLang: TargetLanguageCode
 ) {
-  const authKey = process.env.DEEPL_AUTH_KEY || "";
+  const authKey = process.env.DEEPL_AUTH_KEY || '';
   const translator = new Translator(authKey);
 
   try {
@@ -17,7 +17,7 @@ export async function translatePrompt(
       : result.text;
 
     return {
-      text: translatedText || "",
+      text: translatedText || '',
     };
   } catch (error) {
     return error;

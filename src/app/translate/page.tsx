@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { fetchTranslatePrompt } from "@/utils/client/apiClient";
+import { useState } from 'react';
+import { fetchTranslatePrompt } from '@/utils/client/apiClient';
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
-  const [translatedPrompt, setTranslatedPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
+  const [translatedPrompt, setTranslatedPrompt] = useState('');
 
   const handleTranslate = async () => {
     try {
@@ -14,7 +14,7 @@ export default function Home() {
         setTranslatedPrompt(result.text);
       }
     } catch (error) {
-      console.error("Error translate prompt:", error);
+      console.error('Error translate prompt:', error);
     }
   };
 
