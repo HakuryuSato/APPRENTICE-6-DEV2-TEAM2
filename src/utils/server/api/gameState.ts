@@ -12,20 +12,16 @@ async function handleSetGameState (gameState: GameState) {
 // エラー処理用共通関数
 function respondWithError(errorMessage: string, statusCode: number) {
   return NextResponse.json({ error: errorMessage }, { status: statusCode });
-function respondWithError(errorMessage: string, statusCode: number) {
-  return NextResponse.json({ error: errorMessage }, { status: statusCode });
 }
 
 // 全ユーザーが準備完了済みか判定する関数
 function getAllReady(users: UserStatus[]) {
   if (users.length === 0) return false;
-  return users.every((user) => user.isReady);
 function getAllReady(users: UserStatus[]) {
   if (users.length === 0) return false;
   return users.every((user) => user.isReady);
 }
 
-// 各メソッド用関数 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
 export async function handleGetGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url)
