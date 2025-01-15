@@ -74,7 +74,10 @@ export async function handlePOSTGameState (req: NextRequest) {
             isReady: true
           }
         ],
-        isAllUsersReady: false
+        isAllUsersReady: false,
+        images: {
+          [userStatus.userId]: []
+        }
       } as GameState
 
       await kvSet(gameId, gameState)
@@ -93,6 +96,7 @@ export async function handlePOSTGameState (req: NextRequest) {
         userName: userStatus.userName,
         isReady: true
       })
+      gameState.images[userStatus.userId] = []
 
       await handleSetGameState(gameState)
       break
