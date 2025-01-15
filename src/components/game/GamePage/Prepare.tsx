@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
 import {
@@ -12,58 +12,42 @@ import {
   userIdAtom,
 } from '@/atoms/state';
 import { fetchGameState } from '@/utils/client/apiClient';
+import { usePolling } from '@/hooks/game/GamePage/usePolling';
 
 export const Prepare: React.FC = () => {
   const router = useRouter();
   const [gameId] = useAtom(gameIdAtom);
   const [isAllUsersReady, setIsAllUsersReady] = useState<boolean>(false);
-
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [userName] = useAtom(userNameAtom);
   const [userId] = useAtom(userIdAtom);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
 
-  const startPolling = () => {
-    pollingRef.current = setInterval(async () => {
-      try {
-        const gameState = await fetchGameState(gameId);
-        if (gameState && gameState.users) {
-          console.log(`人数：${gameState.users.length}`);
-          setIsAllUsersReady(gameState.isAllUsersReady);
-        } else {
-          console.error('Game state or users are undefined');
-        }
-      } catch (error) {
-        console.error('Error fetching game state:', error);
+  const { startPolling, stopPolling } = usePolling(async () => {
+    try {
+      const gameState = await fetchGameState(gameId);
+      if (gameState && gameState.users) {
+        console.log(`人数：${gameState.users.length}`);
+        setIsAllUsersReady(gameState.isAllUsersReady);
+      } else {
+        console.error('Game state or users are undefined');
       }
-    }, 1000);
-  };
-
-  const stopAllTimers = () => {
-    if (pollingRef.current) {
-      clearInterval(pollingRef.current);
-      pollingRef.current = null;
+    } catch (error) {
+      console.error('Error fetching game state:', error);
     }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  };
+  }, 1000);
 
   useEffect(() => {
     startPolling();
-    return () => stopAllTimers();
-  }, [gameId, userId, userName]);
+    return () => stopPolling();
+  }, [gameId]);
 
   useEffect(() => {
     if (isAllUsersReady) {
-      stopAllTimers();
-
-      // 3秒後にモードを変更
-      timeoutRef.current = setTimeout(() => {
+      stopPolling();
+      const timeout = setTimeout(() => {
         setTemporaryTopGameLayoutMode({ mode: 'generate' });
-      }, 4000);
+      }, 3000);
+      return () => clearTimeout(timeout);
     }
   }, [isAllUsersReady]);
 
