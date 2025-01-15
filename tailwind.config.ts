@@ -10,16 +10,6 @@ export default {
 
   theme: {
     extend: {
-      animation: {
-        'pop-in': 'pop-in 0.6s ease-in-out',
-      },
-      keyframes: {
-        'pop-in': {
-          '0%': { opacity: '0', transform: 'scale(1.5)' },
-          '50%': { opacity: '1', transform: 'scale(1.2)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
-        },
-      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -75,19 +65,26 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       animation: {
-        "scale-up-center": "scale-up-center 0.4s cubic-bezier(0.39, 0.575, 0.565, 1.0) both",
+        'pop-in': 'pop-in 0.6s ease-in-out',
+        'scale-up-center':
+          'scale-up-center 0.4s cubic-bezier(0.39, 0.575, 0.565, 1.0) both',
       },
       keyframes: {
-        "scale-up-center": {
-          "0%": {
-            transform: "scale(0.5)",
+        'pop-in': {
+          '0%': { opacity: '0', transform: 'scale(1.5)' },
+          '50%': { opacity: '1', transform: 'scale(1.2)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'scale-up-center': {
+          '0%': {
+            transform: 'scale(0.5)',
           },
-          "100%": {
-            transform: "scale(1)",
+          '100%': {
+            transform: 'scale(1)',
           },
-        }
-      }
-    }
+        },
+      },
+    },
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
