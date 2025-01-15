@@ -43,10 +43,7 @@ export const Generate: React.FC = () => {
       {!generateImage ? (
         <>
           <div>前回ラウンドの画像 or 最初の画像</div>
-          <GeneratedImage
-            // className="w-full"
-            url={imageUrl}
-          />
+          <GeneratedImage className="w-full" url={imageUrl} />
           <Input
             value={inputText}
             onChange={handleChangeInput}
