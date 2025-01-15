@@ -11,6 +11,7 @@ export const GeneratedImage: React.FC<GeneratedImageProps> = ({ imageUrl }) => {
       */}
       <AspectRatio ratio={4 / 3}>
         <Image
+          // src={imageUrl}
           src={imageUrl}
           alt="Generated Image"
           className="rounded-md object-cover"

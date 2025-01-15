@@ -17,7 +17,6 @@ export interface GameState {
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
-  
   images: {
     [userId:string] : GeneratedImage[];  // ←辞書でユーザごとに生成した画像を格納したほうが後々便利だと思ったので定義を少し変えました。
   }
