@@ -9,6 +9,9 @@ export interface GameState {
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
+  images: {
+    
+  }
 }
 
 export interface GameStateRequest {
