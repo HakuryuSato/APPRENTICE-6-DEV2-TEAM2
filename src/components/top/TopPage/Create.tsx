@@ -17,7 +17,7 @@ export const Create: React.FC = () => {
   const router = useRouter();
   const [userName] = useAtom(userNameAtom);
   const [userId] = useAtom(userIdAtom);
-  const [gameId, setGameId] = useAtom(gameIdAtom);
+  const [, setGameId] = useAtom(gameIdAtom);
   const [, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得
 
   const [inputText, setInputText] = useState('');
@@ -45,7 +45,7 @@ export const Create: React.FC = () => {
       const userStatus: UserStatus = {
         userId: userId,
         userName: userName,
-        isReady: false,
+        isReady: true,
       };
 
       const response = await updateGameState({

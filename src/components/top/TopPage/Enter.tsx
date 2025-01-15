@@ -1,16 +1,23 @@
 import React from 'react';
 import { useAtom } from 'jotai';
-import { gameIdAtom, topPageModeAtom, userNameAtom } from '@/atoms/state';
+import {
+  gameIdAtom,
+  topPageModeAtom,
+  userIdAtom,
+  userNameAtom,
+} from '@/atoms/state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchGameState } from '@/utils/client/apiClient';
+import { fetchGameState, updateGameState } from '@/utils/client/apiClient';
+import { UserStatus } from '@/types/UserStatus';
 
 export const Enter: React.FC = () => {
   const router = useRouter();
   const [userName] = useAtom(userNameAtom);
-  const [gameId, setGameId] = useAtom(gameIdAtom);
+  const [userId] = useAtom(userIdAtom);
+  const [, setGameId] = useAtom(gameIdAtom);
   const [, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得
 
   const [inputText, setInputText] = useState('');
@@ -31,8 +38,24 @@ export const Enter: React.FC = () => {
         setErrorText(`${inputText.trim()}のroomが見つかりません`);
         return;
       }
-      setGameId(inputText.trim());
-      router.push(`/game/${inputText.trim()}`);
+      const userStatus: UserStatus = {
+        userId: userId,
+        userName: userName,
+        isReady: true,
+      };
+
+      const response = await updateGameState({
+        gameId: inputText.trim(),
+        gameStateRequestType: 'enter',
+        userStatus,
+      });
+
+      if (response) {
+        setGameId(inputText.trim());
+        router.push(`/game/${inputText.trim()}`);
+      } else {
+        setErrorText('ゲームの作成に失敗しました。もう一度お試しください。');
+      }
     } catch (error) {
       console.error('エラー:', error);
       setErrorText(
