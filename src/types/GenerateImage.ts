@@ -4,6 +4,10 @@ export interface GenerateImageRequest {
   size: string; // 例: "256x256"
 }
 
-export interface GenerateImageResponse {
+export interface GenerateImage {
   url: string;
+}
+
+export interface GeneratedImageProps extends GenerateImage {
+  className: string;
 }
