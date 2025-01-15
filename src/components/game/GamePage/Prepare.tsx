@@ -3,107 +3,95 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
-import { userNameAtom, gamePageModeAtom, gameIdAtom } from '@/atoms/state';
-import { UserStatus } from '@/types/UserStatus';
-import { fetchGameState, updateGameState } from '@/utils/client/apiClient';
+import {
+  userNameAtom,
+  gamePageModeAtom,
+  gameIdAtom,
+  userIdAtom,
+} from '@/atoms/state';
+import { fetchGameState } from '@/utils/client/apiClient';
 
 export const Prepare: React.FC = () => {
   const router = useRouter();
   const [gameId] = useAtom(gameIdAtom);
-  const [playerId] = useState(() => uuidv4());
-  const [round, setRound] = useState<number>(1);
-  const [allReady, setAllReady] = useState<boolean>(false);
-  const [images, setImages] = useState<string[]>([]);
-  const [isReady, setIsReady] = useState<boolean>(false);
-  const pollingRef = useRef<NodeJS.Timer | null>(null);
-  //下記の行を追加。userNameAtomを使ってuserNameを取得可能
+  const [isAllUsersReady, setIsAllUsersReady] = useState<boolean>(false);
+
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [userName] = useAtom(userNameAtom);
+  const [userId] = useAtom(userIdAtom);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
 
-  // 全員準備完了確認のポーリング
-  useEffect(() => {
-    if (isReady && !allReady) {
-      pollingRef.current = setInterval(async () => {
-        const res = await fetchGameState(gameId);
-        console.log(res);
-        setRound(res.round);
-        setAllReady(res.isAllUsersReady);
-      }, 1000);
+  const startPolling = () => {
+    pollingRef.current = setInterval(async () => {
+      try {
+        const gameState = await fetchGameState(gameId);
+        if (gameState && gameState.users) {
+          console.log(`人数：${gameState.users.length}`);
+          setIsAllUsersReady(gameState.isAllUsersReady);
+        } else {
+          console.error('Game state or users are undefined');
+        }
+      } catch (error) {
+        console.error('Error fetching game state:', error);
+      }
+    }, 1000);
+  };
 
-      return () => {
-        if (pollingRef.current)
-          clearInterval(pollingRef.current as NodeJS.Timeout); // 型アサーションを追加
-      };
-    } else {
-      setTemporaryTopGameLayoutMode({ mode: 'prepare' });
+  const stopAllTimers = () => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
     }
-  }, [isReady, allReady, gameId]);
-
-  const handleReady = async () => {
-    const res = await fetch('/api/gameState', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'ready', gameId, playerId }),
-    });
-    const data = await res.json();
-    setAllReady(data.allReady);
-    setIsReady(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
   };
 
-  // const handleGenerateImage = async () => {
-  //   const res = await fetch('/api/gameState', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ action: 'generateImage', gameId }),
-  //   });
-  //   const data = await res.json();
-  //   setImages(data.images || []);
-  // };
+  useEffect(() => {
+    startPolling();
+    return () => stopAllTimers();
+  }, [gameId, userId, userName]);
 
-  // const handleNextRound = async () => {
-  //   const res = await fetch('/api/gameState', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ action: 'nextRound', gameId }),
-  //   });
-  //   const data = await res.json();
-  //   setRound(data.round);
-  //   setAllReady(false);
-  //   setIsReady(false);
-  //   setImages(data.images || []);
-  // };
+  useEffect(() => {
+    if (isAllUsersReady) {
+      stopAllTimers();
 
-  const handleClickReady = () => {
-    const userStatus: UserStatus = {
-      userId: playerId,
-      userName: userName,
-      isReady: true,
-    };
-    const response = updateGameState({
-      gameId: gameId,
-      gameStateRequestType: 'create',
-      userStatus,
-    });
-  };
+      // 3秒後にモードを変更
+      timeoutRef.current = setTimeout(() => {
+        setTemporaryTopGameLayoutMode({ mode: 'generate' });
+      }, 4000);
+    }
+  }, [isAllUsersReady]);
 
   const handleClickBack = () => {
     router.push('/');
+    // キャッシュの削除を追加する
   };
 
   return (
-    <div>
-      <p>Name: {userName}</p>
-      <h1>Game: {gameId}</h1>
-      <h2>Round: {round}</h2>
-      {isReady && !allReady && <p>待機中...</p>}
-      <div className="flex gap-4">
-        {!isReady && <Button onClick={handleReady}>準備完了</Button>}
-
-        <Button onClick={handleClickBack}>戻る</Button>
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-center">
+        <p className="font-semibold">Name: {userName}</p>
+        <p className="font-semibold">Room: {gameId}</p>
       </div>
+
+      {!isAllUsersReady ? (
+        <h3 className="text-red-500 text-lg font-medium">
+          全員揃うまでお待ちください
+        </h3>
+      ) : (
+        <div className="text-center">
+          <p className="text-fly-purple font-bold text-xl animate-pop-in">
+            ゲームスタート
+          </p>
+        </div>
+      )}
+
+      <Button onClick={handleClickBack}>戻る</Button>
     </div>
   );
 };
