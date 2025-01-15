@@ -15,16 +15,12 @@ export const useCountDown = (seconds: number, onZero: () => void) => {
       // 音声再生処理（3秒以内の場合）
       if (remainSeconds <= 3) {
         const audio = new Audio('/sound/和太鼓でドン.mp3');
-        audio.play().catch(e => {
-          console.log('Audio play error:', e);
-        });
+        audio.play()
       }
     } else if (remainSeconds === 0) {
       // 音声再生処理（0秒の場合）
       const audio = new Audio('/sound/和太鼓でカカッ.mp3');
-      audio.play().catch(e => {
-        console.log('Audio play error:', e);
-      });
+      audio.play()
 
       // ゼロになったら親から渡された関数を実行
       onZero();
