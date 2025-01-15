@@ -7,7 +7,6 @@ import { userNameAtom } from '@/atoms/state';
 
 export const SignUp: React.FC = () => {
   const [userName, setUserName] = useAtom(userNameAtom);
-  console.log(userName);
   const { inputText, setInputText, handleClickSubmit } = useSignUp(setUserName);
 
   return (
@@ -19,7 +18,7 @@ export const SignUp: React.FC = () => {
         gap: '16px',
       }}
     >
-      <h1>ようこそ、まずはニックネームを入力！ :D</h1>
+      <h1>ニックネームの入力</h1>
       <Input
         type="text"
         value={inputText}
