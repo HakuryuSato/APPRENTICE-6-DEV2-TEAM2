@@ -3,13 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GeneratedImage } from '../GeneratedImage';
 
-// ここで画像生成時にgameIdとuserIdを送信する必要があります
-// generateAPI側で画像生成と同時にGameStateAPIを呼び出し、生成した画像のurlと生成者を格納する予定です。
-// 注:まだGameStateAPI側は未実装です
-
 export const Generate: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
   const [generateImage, setGenerateImage] = useState<string>('');
+  const [round, setRound] = useState<number>(1); // ラウンド状態を管理
 
   const imageUrl =
     'https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
@@ -35,6 +32,7 @@ export const Generate: React.FC = () => {
   const handleClickNext = () => {
     // voteに移動する処理はまだ
     setGenerateImage('');
+    setRound(round + 1);
   };
 
   return (
@@ -42,8 +40,14 @@ export const Generate: React.FC = () => {
       <div>テーマ：かっこいいやつ</div>
       {!generateImage ? (
         <>
-          <div>前回ラウンドの画像 or 最初の画像</div>
-          <GeneratedImage className="w-full" url={imageUrl} />
+          {round === 1 ? (
+            <div>最初のラウンドです。画像はありません。</div>
+          ) : (
+            <>
+              <div>前回ラウンドの画像</div>
+              <GeneratedImage className="w-full" url={imageUrl} />
+            </>
+          )}
           <Input
             value={inputText}
             onChange={handleChangeInput}
