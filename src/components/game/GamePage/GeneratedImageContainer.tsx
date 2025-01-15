@@ -19,6 +19,7 @@ export const GeneratedImageContainer: React.FC = () => {
   const handleVoted = (index: number) => {
     console.log(`Vote ${index + 1} clicked!`);
     // APIに投票内容を送信するロジックを追加予定
+    // resultに移動する処理が必要
   };
 
   // 画像以外をクリックしたら選択解除
@@ -45,9 +46,11 @@ export const GeneratedImageContainer: React.FC = () => {
 
   return (
     <div
-      className="flex items-center justify-center h-screen"
+      className="flex flex-col items-center justify-center h-screen space-y-4 p-4"
       onClick={handleBackgroundClick}
     >
+      <div>投票タイム！！！</div>
+      <div>画像を選んで投票してね！</div>
       <div
         className="grid grid-cols-2 gap-4 w-full"
         onClick={(e) => e.stopPropagation()} // 背景クリックの伝播を防ぐ
