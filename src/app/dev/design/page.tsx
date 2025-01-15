@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 export default function DesignPage() {
   return (
     // SignUp, Create, Enter, Prepare
-    <div className="flex flex-col justify-center items-center h-screen space-y-4 p-8 bg-cover bg-center bg-[url('/kami.jpeg')]">
+    <div className="flex flex-col justify-center items-center h-screen space-y-4 p-8">
       {/* <p>デザインページ</p> */}
       <Input className="w-full py-3" />
       <div className="relative w-full overflow-hidden rounded-lg">
