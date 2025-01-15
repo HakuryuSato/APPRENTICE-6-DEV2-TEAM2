@@ -7,8 +7,19 @@ export default {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+
   theme: {
     extend: {
+      animation: {
+        'pop-in': 'pop-in 0.6s ease-in-out',
+      },
+      keyframes: {
+        'pop-in': {
+          '0%': { opacity: '0', transform: 'scale(1.5)' },
+          '50%': { opacity: '1', transform: 'scale(1.2)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -50,11 +61,12 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        fly: { //fly.ioから抽出した色
-          navy: '#281950',   // ネイビー
-          purple: '#AD75EE',  // 紫
-          blue: '#EEEFFE',    // 水色
-          cream: '#FFFAEC',   // クリーム
+        fly: {
+          //fly.ioから抽出した色
+          navy: '#281950', // ネイビー
+          purple: '#AD75EE', // 紫
+          blue: '#EEEFFE', // 水色
+          cream: '#FFFAEC', // クリーム
         },
       },
       borderRadius: {
