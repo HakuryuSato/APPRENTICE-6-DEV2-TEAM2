@@ -1,19 +1,22 @@
-import { topPageModeAtom } from '@/atoms/state';
+import { topPageModeAtom, userIdAtom, userNameAtom } from '@/atoms/state';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 
-export const useSignUp = (setUserName: (name: string) => void) => {
+export const useSignUp = () => {
   const [inputText, setInputText] = useState('');
-  const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] =
-    useAtom(topPageModeAtom); // グローバルステートから取得]
+
+  // グローバルステート群
+  const [topPageLayoutMode, setTopPageLayoutMode] = useAtom(topPageModeAtom);
+  const [userName, setUserName] = useAtom(userNameAtom);
+  const [userId, setUserId] = useAtom(userIdAtom);
 
   const handleClickSubmit = () => {
-    if (inputText.trim() !== '') {
-      // GlobalStateのuserNameを更新
+    if (inputText !== '') {
+      const uuid = crypto.randomUUID() // 例)"ee3e7d94-b735-4865-ada1-7e86a7723c8f"
+
       setUserName(inputText);
-      setTemporaryTopPageLayoutMode({ mode: 'select' });
-      console.log('userName updated:', inputText);
-      console.log('temporaryTopPageLayoutMode:', temporaryTopPageLayoutMode);
+      setUserId(uuid); // uuid生成
+      setTopPageLayoutMode({ mode: 'select' });
     } else {
       alert('ニックネームを入力してください。');
     }
