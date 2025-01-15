@@ -62,7 +62,7 @@ export const GeneratedImageContainer: React.FC = () => {
             onClick={() => handleTap(value, index)}
           >
             <div className="relative w-full h-full rounded-md overflow-hidden">
-              <GeneratedImage url={imageUrl} />
+              <GeneratedImage className="" url={imageUrl} />
               {isVoteOverlayVisible(value, index) && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">投票する</span>
