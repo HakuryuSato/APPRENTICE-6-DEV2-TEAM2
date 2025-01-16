@@ -38,6 +38,24 @@ function getRandomTargetTheme () {
   return targetThemes[Math.floor(Math.random() * targetThemes.length)];
 }
 
+// ユーザーをGameStateに追加する関数
+function addUserToGameState(gameState: GameState, userStatus: UserStatus): void {
+  // userStatusのバリデーション
+  if (!userStatus.userId || !userStatus.userName) {
+    throw new Error('Invalid userStatus: userId and userName are required');
+  }
+
+  // ユーザーを追加
+  gameState.users.push({
+    userId: userStatus.userId,
+    userName: userStatus.userName,
+    isReady: true,
+  });
+
+  // ユーザーの画像配列を初期化
+  gameState.images[userStatus.userId] = [];
+}
+
 // GameStateを初期化して作成する関数
 function createGameState (gameId: string, userStatus: UserStatus) {
   return {
@@ -45,17 +63,8 @@ function createGameState (gameId: string, userStatus: UserStatus) {
     round: 0, // 0が最初の部屋入室、1以降がゲーム
     targetTheme: getRandomTargetTheme(), // 部屋作成時にお題テーマ設定
     isAllUsersReady: false,
-    users: [
-      // 部屋作成者を追加
-      {
-        userId: userStatus.userId,
-        userName: userStatus.userName,
-        isReady: true,
-      },
-    ],
-    images: {
-      [userStatus.userId]: []
-    },
+    users: [],
+    images: {},
   } as GameState;
 }
 
@@ -134,7 +143,7 @@ export async function handlePOSTGameState (req: NextRequest) {
 
       // 存在しないならば作成
       gameState = createGameState(gameId, userStatus);
-
+      addUserToGameState(gameState, userStatus);
       await kvSet(gameId, gameState);
       break;
     }
@@ -146,12 +155,7 @@ export async function handlePOSTGameState (req: NextRequest) {
         return respondWithError('playerInfo not found', 404);
       }
 
-      gameState.users.push({
-        userId: userStatus.userId,
-        userName: userStatus.userName,
-        isReady: true
-      })
-      gameState.images[userStatus.userId] = []
+      addUserToGameState(gameState, userStatus);
 
       handleGoToNextPhase(gameState);
       break;
