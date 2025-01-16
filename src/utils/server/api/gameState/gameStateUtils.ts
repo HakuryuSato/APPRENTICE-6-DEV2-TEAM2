@@ -1,6 +1,6 @@
-import type { GameState, GameStateRequest } from '@/types/GameState';
+import type { GameState } from '@/types/GameState';
 import type { UserStatus } from '@/types/UserStatus';
-import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
+import { kvSet } from '@/utils/server/vercelKVHandler';
 import { targetThemes } from './targetThemes';
 
 // 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
-import type { UserStatus } from '@/types/UserStatus';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
 import {
   respondWithError,
