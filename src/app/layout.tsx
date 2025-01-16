@@ -1,15 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Yuji_Mai, Dela_Gothic_One, Potta_One } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+const yujiMai = Yuji_Mai({
+  subsets: ['latin'], // 必要に応じてサブセットを指定
+  weight: ['400'], // 使用するウェイトを指定
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+const delaGothicOne = Dela_Gothic_One({
+  subsets: ['latin'], // 必要に応じてサブセットを指定
+  weight: ['400'], // 使用するウェイトを指定
+});
+
+const pottaOne = Potta_One({
+  subsets: ['latin'], // 必要に応じてサブセットを指定
+  weight: ['400'], // 使用するウェイトを指定
 });
 
 export const metadata: Metadata = {
@@ -25,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
+        className={`${delaGothicOne.className} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
       >
         {children}
       </body>
