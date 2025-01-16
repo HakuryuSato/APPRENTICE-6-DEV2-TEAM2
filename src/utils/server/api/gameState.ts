@@ -1,33 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
-import type { UserStatus } from '@/types/UserStatus';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
+import {
+  addUserToGameState,
+  createGameState,
+  handleGoToNextPhase,
+} from './gameState/gameStateUtils';
+import { responseWithError } from '../responseWithError';
 
-// 汎用関数  ---------------------------------------------------------------------------------------------------
-// GameState更新用共通関数
-async function handleSetGameState(gameState: GameState) {
-  await kvSet(gameState.gameId, gameState);
-}
-
-// エラー処理用共通関数
-function respondWithError(errorMessage: string, statusCode: number) {
-  return NextResponse.json({ error: errorMessage }, { status: statusCode });
-}
-
-// 全ユーザーが準備完了済みか判定する関数
-function getAllReady(users: UserStatus[]) {
-  if (users.length !== 4) return false;
-  return users.every((user) => user.isReady);
-}
-
+// HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
-export async function handleGetGameState(req: NextRequest) {
+export async function handleGetGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get('gameId');
 
   // gameIdが存在しなければエラー
   if (!gameId) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   const gameState = await kvGet(gameId);
@@ -37,14 +26,14 @@ export async function handleGetGameState(req: NextRequest) {
 }
 
 // POST  -------------------------------------------------
-export async function handlePOSTGameState(req: NextRequest) {
+export async function handlePOSTGameState (req: NextRequest) {
   // 展開
   const { gameId, gameStateRequestType, userStatus } =
     (await req.json()) as GameStateRequest;
 
   // gameIdまたはgameStateRequestTypeがなければエラー
   if (!gameId || !gameStateRequestType) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   // gameStateの取得
@@ -52,7 +41,7 @@ export async function handlePOSTGameState(req: NextRequest) {
 
   // create以外でGameStateが存在しないならエラー
   if (!gameState && gameStateRequestType !== 'create') {
-    return respondWithError('Missing GameState', 400);
+    return responseWithError('Missing GameState', 400);
   }
 
   // RequestTypeに応じて処理
@@ -62,21 +51,9 @@ export async function handlePOSTGameState(req: NextRequest) {
       // 既にgameStateが存在するならば終了
       if (gameState) break;
 
-      gameState = {
-        gameId: gameId,
-        gamePhase: 'prepare',
-        round: 0,
-        users: [
-          // 部屋作成者を追加
-          {
-            userId: userStatus.userId,
-            userName: userStatus.userName,
-            isReady: true,
-          },
-        ],
-        isAllUsersReady: false,
-      } as GameState;
-
+      // 存在しないならば作成
+      gameState = createGameState(gameId, userStatus);
+      addUserToGameState(gameState, userStatus);
       await kvSet(gameId, gameState);
       break;
     }
@@ -85,16 +62,12 @@ export async function handlePOSTGameState(req: NextRequest) {
     case 'enter': {
       // userIdまたはuserNameがなければエラー
       if (!userStatus.userId || !userStatus.userName) {
-        return respondWithError('playerId not found', 404);
+        return responseWithError('playerInfo not found', 404);
       }
 
-      gameState.users.push({
-        userId: userStatus.userId,
-        userName: userStatus.userName,
-        isReady: true,
-      });
-      gameState.isAllUsersReady = getAllReady(gameState.users);
-      await handleSetGameState(gameState);
+      addUserToGameState(gameState, userStatus);
+
+      handleGoToNextPhase(gameState);
       break;
     }
 
@@ -105,13 +78,12 @@ export async function handlePOSTGameState(req: NextRequest) {
 
       if (userStatus) {
         const user = gameState.users.find(
-          (user) => user.userId === userStatus.userId
+          user => user.userId === userStatus.userId
         );
         if (user) {
           // 参照渡し
           user.isReady = userStatus.isReady;
-          gameState.isAllUsersReady = getAllReady(gameState.users);
-          await handleSetGameState(gameState);
+          handleGoToNextPhase(gameState);
         }
       }
       break;
@@ -122,12 +94,12 @@ export async function handlePOSTGameState(req: NextRequest) {
 }
 
 // DELETE -------------------------------------------------
-export async function handleDeleteGameState(req: NextRequest) {
+export async function handleDeleteGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get('gameId');
 
   if (!gameId) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   await kvDel(gameId);
