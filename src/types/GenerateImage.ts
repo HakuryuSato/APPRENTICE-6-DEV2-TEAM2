@@ -7,7 +7,7 @@ export interface GenerateImage {
 
 export interface GenerateImageRequest {
   gameState: GameState;
-  userId: Pick<UserStatus, 'userId'>;
+  userId: UserStatus['userId']
   prompt: string;
 }
 
