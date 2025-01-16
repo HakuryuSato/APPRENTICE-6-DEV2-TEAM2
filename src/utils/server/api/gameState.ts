@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
 import {
-  respondWithError,
   addUserToGameState,
   createGameState,
   handleGoToNextPhase,
 } from './gameState/gameStateUtils';
+import { responseWithError } from '../responseWithError';
 
 // HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
@@ -16,7 +16,7 @@ export async function handleGetGameState (req: NextRequest) {
 
   // gameIdが存在しなければエラー
   if (!gameId) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   const gameState = await kvGet(gameId);
@@ -33,7 +33,7 @@ export async function handlePOSTGameState (req: NextRequest) {
 
   // gameIdまたはgameStateRequestTypeがなければエラー
   if (!gameId || !gameStateRequestType) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   // gameStateの取得
@@ -41,7 +41,7 @@ export async function handlePOSTGameState (req: NextRequest) {
 
   // create以外でGameStateが存在しないならエラー
   if (!gameState && gameStateRequestType !== 'create') {
-    return respondWithError('Missing GameState', 400);
+    return responseWithError('Missing GameState', 400);
   }
 
   // RequestTypeに応じて処理
@@ -62,7 +62,7 @@ export async function handlePOSTGameState (req: NextRequest) {
     case 'enter': {
       // userIdまたはuserNameがなければエラー
       if (!userStatus.userId || !userStatus.userName) {
-        return respondWithError('playerInfo not found', 404);
+        return responseWithError('playerInfo not found', 404);
       }
 
       addUserToGameState(gameState, userStatus);
@@ -99,7 +99,7 @@ export async function handleDeleteGameState (req: NextRequest) {
   const gameId = searchParams.get('gameId');
 
   if (!gameId) {
-    return respondWithError('Missing gameId', 400);
+    return responseWithError('Missing gameId', 400);
   }
 
   await kvDel(gameId);
