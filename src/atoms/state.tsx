@@ -2,7 +2,6 @@ import { atomWithStorage } from 'jotai/utils';
 import type { GameState } from '@/types/GameState';
 
 export const userNameAtom = atomWithStorage('userName', '');
-export const gameIdAtom = atomWithStorage('gameId', '');
 export const userIdAtom = atomWithStorage('userId', '');
 
 //temporaryTopPageLayoutModeは　sign-up, select, create, enter
