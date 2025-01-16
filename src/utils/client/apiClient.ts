@@ -44,12 +44,14 @@ async function handleFetchApi<T> (
 
 // プロンプトから画像生成 -------------------------------------------------
 export async function fetchGenerateImage ({
-  gameState,
+  gameId,
+  round,
   userId,
   prompt,
 }: GenerateImageRequest): Promise<GenerateImage | null> {
   const generateImageRequest = {
-    gameState,
+    gameId,
+    round,
     userId,
     prompt,
   };
