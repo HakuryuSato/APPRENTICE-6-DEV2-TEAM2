@@ -5,7 +5,6 @@ export type GameStateRequestType = 'create' | 'enter' | 'ready';
 
 export interface GameState {
   gameId: string;
-  gamePhase: GamePhase;
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
