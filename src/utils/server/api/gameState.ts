@@ -53,7 +53,9 @@ function createGameState (gameId: string, userStatus: UserStatus) {
         isReady: true,
       },
     ],
-    images: [],
+    images: {
+      [userStatus.userId]: []
+    },
   } as GameState;
 }
 
