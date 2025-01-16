@@ -19,58 +19,21 @@ interface OpenAiImageRequest {
   size: ImageSize;
 }
 
-export async function insertImageUrlToGameState (
-  url: string,
-  userId: string,
-  gameState: GameState
-) {
-  try {
-    const currentGameState = (await kvGet(gameState.gameId)) as GameState;
 
-    const generatedImage: GeneratedImage = {
-      url: url,
-      isError: false,
-      error: null,
-    };
-
-    // 不正なラウンド番号をチェック
-    if (gameState.round < 0) {
-      throw new Error('Invalid round number: Round cannot be negative');
-    }
-
-    // ユーザーのimages配列が存在しない場合は初期化
-    if (!currentGameState.images[userId]) {
-      currentGameState.images[userId] = [];
-    }
-
-    // 現在のラウンドが配列の長さと一致することを確認
-    if (gameState.round !== currentGameState.images[userId].length) {
-      throw new Error(`Invalid round number: Expected round ${currentGameState.images[userId].length}, got ${gameState.round}`);
-    }
-
-    // GeneratedImage型のオブジェクトを配列に追加
-    currentGameState.images[userId].push(generatedImage);
-
-    await kvSet(gameState.gameId, currentGameState);
-  } catch (error) {
-    console.error('Error inserting image to game state:', error);
-    throw error;
-  }
-}
 
 // POST
 export async function generateImage (
   request: GenerateImageRequest
 ): Promise<GenerateImage> {
   // リクエストから必要なデータを取得
-  const { prompt, userId, gameState } = request;
+  const { prompt, userId, gameId, round } = request;
 
   // 引数が不足していればエラー
-  if (!prompt || !userId || !gameState)
-    return responseWithError('Need prompt, userId, gameState.', 400);
+  if (!prompt || !userId || !gameId || round === undefined)
+    return responseWithError('Need prompt, userId, gameId, and round.', 400);
 
+  // OpenAI APIで画像生成
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   try {
     const context: OpenAiImageRequest = {
       prompt: prompt,
@@ -88,16 +51,55 @@ export async function generateImage (
         404
       );
 
-    // 非同期で画像をGameStateに追加
-    await insertImageUrlToGameState(imageUrl, userId, gameState);
 
-    // urlを返す
+
+    // 非同期で画像をGameStateに追加
+    insertImageUrlToGameState(imageUrl, userId, gameId, round);
+
+    // 先にurlを返す
     return { url: imageUrl };
+
   } catch (error) {
     console.error(
       'Image generation error:',
       error instanceof Error ? error.message : 'Unknown error'
     );
     return { url: '' };
+  }
+}
+
+// GameStateに画像urlを保存するための関数
+async function insertImageUrlToGameState (
+  url: string,
+  userId: string,
+  gameId: string,
+  round: number
+) {
+  try {
+    const currentGameState = (await kvGet(gameId)) as GameState;
+
+    const generatedImage: GeneratedImage = {
+      url: url,
+      isError: false,
+      error: null,
+    };
+
+    // ユーザーのimages配列が存在しない場合は初期化
+    if (!currentGameState.images[userId]) {
+      currentGameState.images[userId] = [];
+    }
+
+    // 現在のラウンドが配列の長さと一致することを確認
+    if (round !== currentGameState.images[userId].length) {
+      throw new Error(`Invalid round number: Expected round ${currentGameState.images[userId].length}, got ${round}`);
+    }
+
+    // GeneratedImage型のオブジェクトを配列に追加
+    currentGameState.images[userId].push(generatedImage);
+
+    await kvSet(gameId, currentGameState);
+  } catch (error) {
+    console.error('Error inserting image to game state:', error);
+    throw error;
   }
 }
