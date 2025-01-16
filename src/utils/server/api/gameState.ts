@@ -106,7 +106,6 @@ export async function handlePOSTGameState (req: NextRequest) {
 
       gameState = {
         gameId: gameId,
-        gamePhase: 'prepare',
         round: 0, // 0が最初の部屋入室、1以降がゲーム
         users: [
           // 部屋作成者を追加
