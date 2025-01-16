@@ -1,40 +1,38 @@
-// app/game/[game-uuid]/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
 import {
   userNameAtom,
   gamePageModeAtom,
-  gameIdAtom,
   userIdAtom,
+  gameStateAtom,
 } from '@/atoms/state';
-import { fetchGameState } from '@/utils/client/apiClient';
 import { usePolling } from '@/hooks/game/GamePage/usePolling';
+import { selectAtom } from 'jotai/utils';
+import { useGameState } from '@/hooks/game/GamePage/useGameState';
+
+const gameIdSelector = selectAtom(gameStateAtom, (state) => state.gameId ?? '');
+const isAllUsersReadySelector = selectAtom(
+  gameStateAtom,
+  (state) => state.isAllUsersReady ?? false
+);
 
 export const Prepare: React.FC = () => {
   const router = useRouter();
-  const [gameId] = useAtom(gameIdAtom);
-  const [isAllUsersReady, setIsAllUsersReady] = useState<boolean>(false);
+  const [gameId] = useAtom(gameIdSelector);
+  const [isAllUsersReady] = useAtom(isAllUsersReadySelector);
   const [userName] = useAtom(userNameAtom);
   const [userId] = useAtom(userIdAtom);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
+  const { refreshGameState } = useGameState();
 
-  const { startPolling, stopPolling } = usePolling(async () => {
-    try {
-      const gameState = await fetchGameState(gameId);
-      if (gameState && gameState.users) {
-        console.log(`人数：${gameState.users.length}`);
-        setIsAllUsersReady(gameState.isAllUsersReady);
-      } else {
-        console.error('Game state or users are undefined');
-      }
-    } catch (error) {
-      console.error('Error fetching game state:', error);
-    }
-  }, 1000);
+  const { startPolling, stopPolling } = usePolling(
+    () => refreshGameState({ gameId }),
+    1000
+  );
 
   useEffect(() => {
     startPolling();
