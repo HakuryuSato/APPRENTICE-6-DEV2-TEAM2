@@ -4,6 +4,7 @@ import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
 import { GameState, GeneratedImage } from '@/types/GameState';
 import { GenerateImageRequest, GenerateImage } from '@/types/GenerateImage';
 import { responseWithError } from '../responseWithError';
+import { NextRequest } from 'next/server';
 import type { UserStatus } from '@/types/UserStatus';
 
 type ImageSize =
@@ -23,10 +24,13 @@ interface OpenAiImageRequest {
 
 // POST
 export async function generateImage (
-  request: GenerateImageRequest
+  req: NextRequest
 ): Promise<GenerateImage> {
   // リクエストから必要なデータを取得
-  const { prompt, userId, gameId, round } = request;
+  const body: GenerateImageRequest = await req.json();
+
+  // 必要なデータを取得
+  const { prompt, userId, gameId, round } = body;
 
   // 引数が不足していればエラー
   if (!prompt || !userId || !gameId || !round)
@@ -50,7 +54,6 @@ export async function generateImage (
         'No image was returned from the OpenAI API.',
         404
       );
-
 
 
     // 非同期で画像をGameStateに追加
@@ -88,6 +91,7 @@ async function insertImageUrlToGameState (
     if (!currentGameState.images[userId]) {
       currentGameState.images[userId] = [];
     }
+
 
     // 現在のラウンドが配列の長さと一致することを確認
     if (round !== currentGameState.images[userId].length) {
