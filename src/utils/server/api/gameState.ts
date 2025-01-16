@@ -143,7 +143,7 @@ export async function handlePOSTGameState (req: NextRequest) {
     case 'enter': {
       // userIdまたはuserNameがなければエラー
       if (!userStatus.userId || !userStatus.userName) {
-        return respondWithError('playerId not found', 404);
+        return respondWithError('playerInfo not found', 404);
       }
 
       gameState.users.push({
