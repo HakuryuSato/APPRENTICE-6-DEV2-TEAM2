@@ -65,7 +65,7 @@ export const Enter: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <p>ニックネーム: {userName}</p>
 
       <h1>ゲームIDを入力してください</h1>
@@ -80,7 +80,7 @@ export const Enter: React.FC = () => {
         <Button onClick={handleClickSubmit}>roomに入る</Button>
         <Button onClick={handleClickBack}>戻る</Button>
       </div>
-    </div>
+    </>
   );
 };
 

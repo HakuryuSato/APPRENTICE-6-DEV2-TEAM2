@@ -71,7 +71,7 @@ export const Create: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <p>ニックネーム: {userName}</p>
 
       <h1>任意のゲームIDを入力してください</h1>
@@ -86,7 +86,7 @@ export const Create: React.FC = () => {
         <Button onClick={handleClickSubmit}>roomを作る</Button>
         <Button onClick={handleClickBack}>戻る</Button>
       </div>
-    </div>
+    </>
   );
 };
 

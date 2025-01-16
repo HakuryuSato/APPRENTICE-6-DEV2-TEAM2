@@ -12,7 +12,7 @@ export const TopPage: React.FC = () => {
   const [temporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから現在のモードを取得
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center h-screen space-y-4 p-4">
       {/* モードが 'sign-up' の場合に SignUp コンポーネントを表示 */}
       {temporaryTopPageLayoutMode?.mode === 'sign-up' && <SignUp />}
       {temporaryTopPageLayoutMode?.mode === 'select' && <Select />}

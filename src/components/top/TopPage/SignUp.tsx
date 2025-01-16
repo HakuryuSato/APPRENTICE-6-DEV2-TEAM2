@@ -7,7 +7,7 @@ export const SignUp: React.FC = () => {
   const { inputText, setInputText, handleClickSubmit } = useSignUp();
 
   return (
-    <div>
+    <>
       <h1>ニックネームの入力</h1>
       <Input
         type="text"
@@ -16,7 +16,7 @@ export const SignUp: React.FC = () => {
         placeholder="ニックネーム"
       />
       <Button onClick={handleClickSubmit}>はじめる</Button>
-    </div>
+    </>
   );
 };
 

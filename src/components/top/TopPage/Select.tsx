@@ -19,14 +19,14 @@ export const Select: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <p>ニックネーム: {userName}</p>
       <div>
         <Button onClick={handleClickCreate}>ルームを作る</Button>
         <Button onClick={handleClickEnter}>ルームに入る</Button>
       </div>
       <Button onClick={handleClickBack}>戻る</Button>
-    </div>
+    </>
   );
 };
 
