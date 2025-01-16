@@ -3,9 +3,13 @@
 response.dataからの展開はこの関数内で行い、展開後のデータをクライアントサイドへ返している。
 */
 
-import type { GenerateImage } from '@/types/GenerateImage';
+import type {
+  GenerateImage,
+  GenerateImageRequest,
+} from '@/types/GenerateImage';
 import { TranslatePromptResponse } from '@/types/TranslatePrompt';
 import type { GameState, GameStateRequest } from '@/types/GameState';
+import type { UserStatus } from '@/types/UserStatus';
 
 /**
  * 共通のAPI fetchエラーハンドリング関数
@@ -17,7 +21,7 @@ import type { GameState, GameStateRequest } from '@/types/GameState';
  * @returns {Promise<T>} - レスポンスから抽出されたデータを型Tを含むPromiseとして返す
  * @throws {Error} - フェッチ処理中にエラーが発生した場合の処理
  */
-async function handleFetchApi<T>(
+async function handleFetchApi<T> (
   url: string,
   options?: RequestInit
 ): Promise<T> {
@@ -39,19 +43,25 @@ async function handleFetchApi<T>(
 }
 
 // プロンプトから画像生成 -------------------------------------------------
-// ここでgameStateを引数として受け取るよう修正
-export async function fetchGenerateImage (
-  prompt: string
-): Promise<GenerateImage | null> {
+export async function fetchGenerateImage ({
+  gameState,
+  userId,
+  prompt,
+}: GenerateImageRequest): Promise<GenerateImage | null> {
+  const generateImageRequest = {
+    gameState,
+    userId,
+    prompt,
+  };
   return await handleFetchApi<GenerateImage>('/api/generate-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ generateImageRequest }),
   });
 }
 
 // プロンプトを英語に翻訳 --------------------------------------------------
-export async function fetchTranslatePrompt(
+export async function fetchTranslatePrompt (
   prompt: string
 ): Promise<TranslatePromptResponse | null> {
   return await handleFetchApi<TranslatePromptResponse>(
@@ -65,7 +75,7 @@ export async function fetchTranslatePrompt(
 }
 
 // ゲーム状態を取得 -------------------------------------------------
-export async function fetchGameState(
+export async function fetchGameState (
   gameId: string
 ): Promise<GameState | null> {
   return await handleFetchApi<GameState>(
@@ -78,7 +88,7 @@ export async function fetchGameState(
 }
 
 // ゲーム状態を更新 -------------------------------------------------
-export async function updateGameState({
+export async function updateGameState ({
   gameId,
   gameStateRequestType,
   userStatus,
@@ -96,7 +106,7 @@ export async function updateGameState({
 }
 
 // ゲーム状態を削除 -------------------------------------------------
-export async function deleteGameState(gameId: string): Promise<void> {
+export async function deleteGameState (gameId: string): Promise<void> {
   return await handleFetchApi<void>(
     `/api/game-state?gameId=${encodeURIComponent(gameId)}`,
     {
