@@ -40,16 +40,17 @@ export async function handleGoToNextPhase (gameState: GameState) {
 
   // 今回の更新で全員が準備完了したなら実行
   if (!gameState.isAllUsersReady && getAllReady(gameState.users)) {
-    console.log("Vercelデバッグ用:gameState.ts全員準備完了")
+    console.log('Vercelデバッグ用:gameState.ts全員準備完了');
     // isAllUsersReady を true にして一時保存
     gameState.isAllUsersReady = true;
+    gameState.round += 1;
     await handleSetGameState(gameState);
 
     // 全ユーザーが次のフェーズへ移れるよう5秒待機
     // *最大インスタンス数 = ユーザー数
-    console.log("Vercelデバッグ用:gameState.ts待機開始")
+    console.log('Vercelデバッグ用:gameState.ts待機開始');
     await delayMs(5000);
-    console.log("Vercelデバッグ用:gameState.ts待機終了")
+    console.log('Vercelデバッグ用:gameState.ts待機終了');
 
     // isAllUsersReady・全ユーザーのisReadyをfalseにして保存
 
@@ -106,7 +107,7 @@ export async function handlePOSTGameState (req: NextRequest) {
       gameState = {
         gameId: gameId,
         gamePhase: 'prepare',
-        round: 0,
+        round: 0, // 0が最初の部屋入室、1以降がゲーム
         users: [
           // 部屋作成者を追加
           {
