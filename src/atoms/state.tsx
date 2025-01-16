@@ -1,4 +1,5 @@
 import { atomWithStorage } from 'jotai/utils';
+import type { GameState } from '@/types/GameState';
 
 export const userNameAtom = atomWithStorage('userName', '');
 export const gameIdAtom = atomWithStorage('gameId', '');
@@ -12,3 +13,8 @@ export const topPageModeAtom = atomWithStorage('temporaryTopPageLayoutMode', {
 export const gamePageModeAtom = atomWithStorage('gamePageMode', {
   mode: 'prepare',
 });
+
+export const gameStateAtom = atomWithStorage<Partial<GameState>>(
+  "gameState",
+  {},
+);
