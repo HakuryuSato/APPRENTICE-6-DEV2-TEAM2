@@ -1,48 +1,101 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GeneratedImage } from '../GeneratedImage';
+import {
+  fetchGameState,
+  fetchGenerateImage,
+  fetchTranslatePrompt,
+} from '@/utils/client/apiClient';
+import { useAtom } from 'jotai';
+import {
+  gameIdAtom,
+  gamePageModeAtom,
+  promptsAtom,
+  userIdAtom,
+} from '@/atoms/state';
 
 export const Generate: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
-  const [generateImage, setGenerateImage] = useState<string>('');
-  const [round, setRound] = useState<number>(1); // ラウンド状態を管理
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [round] = useState<number>(1);
+  const [theme, setTheme] = useState<string>('');
+  const [isGenerated, setIsGenerated] = useState<boolean>(false);
+  const [prompts, setPrompts] = useAtom(promptsAtom);
+  const [gameId] = useAtom(gameIdAtom);
+  const [userId] = useAtom(userIdAtom);
+  const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
 
-  const imageUrl =
-    'https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
+  useEffect(() => {
+    const fetchAndSetImage = async () => {
+      try {
+        const gameState = await fetchGameState(gameId);
+        if (gameState) {
+          const imageUrl = gameState.images[userId][round]?.url;
+          setImageUrl(imageUrl);
+          setTheme(gameState.targetTheme);
+        }
+      } catch (error) {
+        console.error('Error fetching game state:', error);
+      }
+    };
+    fetchAndSetImage();
+  }, []);
+  // テーマをそのまま入れられないようにする？
   // 入力されたテキスト
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setInputText(e.target.value);
+    const value = e.target.value;
+    // 10文字以内に制限
+    if (value.length <= 10) {
+      setInputText(value);
+    }
   };
 
   // 画像生成ボタン
-  const handleClickGenerate = () => {
+  const handleClickGenerate = async () => {
     if (!inputText.trim()) {
       alert('テキストを入力してください');
       return;
     }
-
-    console.log('生成しました');
     // 画像生成APIを呼び出しはまだ
-    setGenerateImage('生成された画像です');
-    setInputText('');
+    try {
+      const translatePrompt = await fetchTranslatePrompt(inputText.trim());
+      if (typeof translatePrompt === 'string') {
+        setPrompts((prev) => [...prev, translatePrompt]);
+      }
+
+      const finalPrompt = [...prompts, translatePrompt].join(' + ');
+      console.log('送信するプロンプト:', finalPrompt);
+
+      const GeneratedResultImage = await fetchGenerateImage({
+        gameId: gameId,
+        round: round,
+        userId: userId,
+        prompt: finalPrompt,
+      });
+
+      if (typeof translatePrompt === 'string') {
+        setPrompts((prev) => [...prev, translatePrompt]);
+      }
+      setImageUrl(GeneratedResultImage?.url || '');
+      setIsGenerated(true);
+    } catch (error) {
+      console.error('Error generating image:', error);
+    }
   };
 
   const handleClickNext = () => {
-    // voteに移動する処理はまだ
-    setGenerateImage('');
-    setRound(round + 1);
+    setTemporaryTopGameLayoutMode({ mode: 'vote' });
   };
 
   return (
     <div className="flex flex-col justify-center items-center h-screen space-y-4 p-4">
-      <div>テーマ：かっこいいやつ</div>
-      {!generateImage ? (
+      <p className="text-xl font-bold animate-pop-in">ROUND{round}</p>
+      <div>テーマ：{theme}</div>
+      {!isGenerated ? (
         <>
-          {round === 1 ? (
-            <div>最初のラウンドです。画像はありません。</div>
-          ) : (
+          <div>10文字以内で入力してください</div>
+          {imageUrl && (
             <>
               <div>前回ラウンドの画像</div>
               <GeneratedImage className="w-full" url={imageUrl} />
@@ -51,18 +104,20 @@ export const Generate: React.FC = () => {
           <Input
             value={inputText}
             onChange={handleChangeInput}
-            placeholder="画像生成のためのテキストを入力してください"
+            placeholder="テキストを入力してください"
             className="w-full"
           />
+          <p>{inputText.length} / 10 文字</p>
+
           <Button onClick={handleClickGenerate} className="w-full rounded-lg">
             生成する
           </Button>
         </>
       ) : (
         <>
-          <div className="text-xl font-bold mt-4">{generateImage}</div>
+          <GeneratedImage className="text-xl font-bold mt-4" url={imageUrl} />
           <Button onClick={handleClickNext} className="w-full rounded-lg">
-            次へ(戻る)
+            みんなの画像を見にいく
           </Button>
         </>
       )}
