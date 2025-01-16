@@ -71,8 +71,7 @@ export default {
       },
       keyframes: {
         'pop-in': {
-          '0%': { opacity: '0', transform: 'scale(1.5)' },
-          '50%': { opacity: '1', transform: 'scale(1.2)' },
+          '0%': { opacity: '0', transform: 'scale(5.5)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
         'scale-up-center': {
