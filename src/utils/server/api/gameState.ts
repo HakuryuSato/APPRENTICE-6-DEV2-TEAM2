@@ -3,7 +3,7 @@ import type { GameState, GameStateRequest } from '@/types/GameState';
 import type { UserStatus } from '@/types/UserStatus';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
 
-// 汎用関数  ---------------------------------------------------------------------------------------------------
+// 汎用関数群  ---------------------------------------------------------------------------------------------------
 // GameState更新用共通関数
 async function handleSetGameState (gameState: GameState) {
   await kvSet(gameState.gameId, gameState);
@@ -31,6 +31,8 @@ function resetAllUsersReadyState (gameState: GameState) {
 function delayMs (ms: number) {
   return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
+
+// 
 
 // 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数
 // 注:Vercelではタイムアウト10秒のため待機時間を長く設定しすぎないこと
@@ -62,6 +64,8 @@ export async function handleGoToNextPhase (gameState: GameState) {
   await handleSetGameState(gameState);
 }
 
+
+// HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
 export async function handleGetGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url);
