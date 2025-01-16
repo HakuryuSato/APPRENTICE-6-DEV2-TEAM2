@@ -3,6 +3,5 @@ import { handleExternalApiRequest } from '@/utils/server/handleExternalApiReques
 import { generateImage } from '@/utils/server/api/generateImage';
 
 export async function POST(request: NextRequest) {
-  const { prompt } = await request.json();
-  return handleExternalApiRequest(() => generateImage(prompt));
+  return handleExternalApiRequest(() => generateImage(request));
 }
