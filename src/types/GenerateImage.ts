@@ -8,13 +8,10 @@ export interface GenerateImageRequest {
   gameId: string; // ゲームID
 }
 
-export interface GenerateImageResponse {
-  url: string ; // 生成された画像のURL
-  isError:boolean; // エラーが発生したかどうか
-  error : Error | null; // エラーが発生した場合のエラー
-  gameState: GameState; // 更新されたゲームステート
+export interface GenerateImage {
+  url: string;
 }
 
-export interface GeneratedImageProps {
-  imageUrl: string;
+export interface GeneratedImageProps extends GenerateImage {
+  className: string;
 }

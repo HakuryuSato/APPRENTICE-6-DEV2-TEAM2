@@ -13,7 +13,7 @@ export interface GeneratedImage {
 
 export interface GameState {
   gameId: string;
-  gamePhase: GamePhase;
+  targetTheme: string;
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
