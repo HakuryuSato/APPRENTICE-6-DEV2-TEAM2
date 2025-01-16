@@ -1,5 +1,5 @@
 import type { UserStatus } from './UserStatus';
-import type { GenerateImageResponse } from './GenerateImage';
+import type { GenerateImage } from './GenerateImage';
 
 export type GamePhase = 'prepare' | 'generate' | 'vote' | 'result';
 export type GameStateRequestType = 'create' | 'enter' | 'ready';
