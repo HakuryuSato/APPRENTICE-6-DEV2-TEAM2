@@ -5,6 +5,7 @@ export type GameStateRequestType = 'create' | 'enter' | 'ready';
 
 export interface GameState {
   gameId: string;
+  targetTheme: string;
   round: number;
   users: UserStatus[];
   isAllUsersReady: boolean;
