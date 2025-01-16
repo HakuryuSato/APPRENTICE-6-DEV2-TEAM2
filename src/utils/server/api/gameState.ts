@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
 import type { UserStatus } from '@/types/UserStatus';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
+import { targetThemes } from './gameState/targetThemes';
 
 // 汎用関数群  ---------------------------------------------------------------------------------------------------
 // GameState更新用共通関数
@@ -32,11 +33,33 @@ function delayMs (ms: number) {
   return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
-// 
+// ランダムなお題を返す関数
+function getRandomTargetTheme () {
+  return targetThemes[Math.floor(Math.random() * targetThemes.length)];
+}
+
+// GameStateを初期化して作成する関数
+function createGameState (gameId: string, userStatus: UserStatus) {
+  return {
+    gameId: gameId,
+    round: 0, // 0が最初の部屋入室、1以降がゲーム
+    targetTheme: getRandomTargetTheme(), // 部屋作成時にお題テーマ設定
+    isAllUsersReady: false,
+    users: [
+      // 部屋作成者を追加
+      {
+        userId: userStatus.userId,
+        userName: userStatus.userName,
+        isReady: true,
+      },
+    ],
+    images: [],
+  } as GameState;
+}
 
 // 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数
 // 注:Vercelではタイムアウト10秒のため待機時間を長く設定しすぎないこと
-export async function handleGoToNextPhase (gameState: GameState) {
+async function handleGoToNextPhase (gameState: GameState) {
   // すでにtrueなら何もしない
   if (gameState.isAllUsersReady) return;
 
@@ -63,7 +86,6 @@ export async function handleGoToNextPhase (gameState: GameState) {
   // 今回の更新で全員が準備完了でないなら
   await handleSetGameState(gameState);
 }
-
 
 // HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
@@ -108,19 +130,8 @@ export async function handlePOSTGameState (req: NextRequest) {
       // 既にgameStateが存在するならば終了
       if (gameState) break;
 
-      gameState = {
-        gameId: gameId,
-        round: 0, // 0が最初の部屋入室、1以降がゲーム
-        users: [
-          // 部屋作成者を追加
-          {
-            userId: userStatus.userId,
-            userName: userStatus.userName,
-            isReady: true,
-          },
-        ],
-        isAllUsersReady: false,
-      } as GameState;
+      // 存在しないならば作成
+      gameState = createGameState(gameId, userStatus);
 
       await kvSet(gameId, gameState);
       break;
