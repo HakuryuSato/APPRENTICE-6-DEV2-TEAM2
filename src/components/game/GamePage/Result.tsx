@@ -9,7 +9,7 @@ export const Result: React.FC = () => {
   const resetState = useResetState();  // フックをトップレベルで呼び出す
   const router = useRouter();  // useRouter もトップレベルで呼び出す
 
-  const handleResetState = () => {
+  const handleClickResetGame = () => {
     resetState();  // 状態リセット
     router.push('/');  // トップページに遷移
   };
