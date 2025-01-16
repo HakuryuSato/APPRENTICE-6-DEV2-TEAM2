@@ -2,26 +2,94 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
 import type { UserStatus } from '@/types/UserStatus';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
+import { targetThemes } from './gameState/targetThemes';
 
-// 汎用関数  ---------------------------------------------------------------------------------------------------
+// 汎用関数群  ---------------------------------------------------------------------------------------------------
 // GameState更新用共通関数
-async function handleSetGameState(gameState: GameState) {
+async function handleSetGameState (gameState: GameState) {
   await kvSet(gameState.gameId, gameState);
 }
 
 // エラー処理用共通関数
-function respondWithError(errorMessage: string, statusCode: number) {
+function respondWithError (errorMessage: string, statusCode: number) {
   return NextResponse.json({ error: errorMessage }, { status: statusCode });
 }
 
 // 全ユーザーが準備完了済みか判定する関数
-function getAllReady(users: UserStatus[]) {
+function getAllReady (users: UserStatus[]) {
   if (users.length !== 4) return false;
-  return users.every((user) => user.isReady);
+  return users.every(user => user.isReady);
 }
 
+// 全ユーザーのisReadyをfalseする関数
+function resetAllUsersReadyState (gameState: GameState) {
+  gameState.users.forEach(user => {
+    user.isReady = false;
+  });
+}
+
+// 一定時間待機する関数
+function delayMs (ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
+}
+
+// ランダムなお題を返す関数
+function getRandomTargetTheme () {
+  return targetThemes[Math.floor(Math.random() * targetThemes.length)];
+}
+
+// GameStateを初期化して作成する関数
+function createGameState (gameId: string, userStatus: UserStatus) {
+  return {
+    gameId: gameId,
+    round: 0, // 0が最初の部屋入室、1以降がゲーム
+    targetTheme: getRandomTargetTheme(), // 部屋作成時にお題テーマ設定
+    isAllUsersReady: false,
+    users: [
+      // 部屋作成者を追加
+      {
+        userId: userStatus.userId,
+        userName: userStatus.userName,
+        isReady: true,
+      },
+    ],
+    images: [],
+  } as GameState;
+}
+
+// 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数
+// 注:Vercelではタイムアウト10秒のため待機時間を長く設定しすぎないこと
+async function handleGoToNextPhase (gameState: GameState) {
+  // すでにtrueなら何もしない
+  if (gameState.isAllUsersReady) return;
+
+  // 今回の更新で全員が準備完了したなら実行
+  if (!gameState.isAllUsersReady && getAllReady(gameState.users)) {
+    console.log('Vercelデバッグ用:gameState.ts全員準備完了');
+    // isAllUsersReady を true にして一時保存
+    gameState.isAllUsersReady = true;
+    gameState.round += 1;
+    await handleSetGameState(gameState);
+
+    // 全ユーザーが次のフェーズへ移れるよう5秒待機
+    // *最大インスタンス数 = ユーザー数
+    console.log('Vercelデバッグ用:gameState.ts待機開始');
+    await delayMs(5000);
+    console.log('Vercelデバッグ用:gameState.ts待機終了');
+
+    // isAllUsersReady・全ユーザーのisReadyをfalseにして保存
+
+    gameState.isAllUsersReady = false;
+    resetAllUsersReadyState(gameState);
+  }
+
+  // 今回の更新で全員が準備完了でないなら
+  await handleSetGameState(gameState);
+}
+
+// HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
 // GET  -------------------------------------------------
-export async function handleGetGameState(req: NextRequest) {
+export async function handleGetGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get('gameId');
 
@@ -37,7 +105,7 @@ export async function handleGetGameState(req: NextRequest) {
 }
 
 // POST  -------------------------------------------------
-export async function handlePOSTGameState(req: NextRequest) {
+export async function handlePOSTGameState (req: NextRequest) {
   // 展開
   const { gameId, gameStateRequestType, userStatus } =
     (await req.json()) as GameStateRequest;
@@ -62,20 +130,8 @@ export async function handlePOSTGameState(req: NextRequest) {
       // 既にgameStateが存在するならば終了
       if (gameState) break;
 
-      gameState = {
-        gameId: gameId,
-        gamePhase: 'prepare',
-        round: 0,
-        users: [
-          // 部屋作成者を追加
-          {
-            userId: userStatus.userId,
-            userName: userStatus.userName,
-            isReady: true,
-          },
-        ],
-        isAllUsersReady: false,
-      } as GameState;
+      // 存在しないならば作成
+      gameState = createGameState(gameId, userStatus);
 
       await kvSet(gameId, gameState);
       break;
@@ -93,8 +149,8 @@ export async function handlePOSTGameState(req: NextRequest) {
         userName: userStatus.userName,
         isReady: true,
       });
-      gameState.isAllUsersReady = getAllReady(gameState.users);
-      await handleSetGameState(gameState);
+
+      handleGoToNextPhase(gameState);
       break;
     }
 
@@ -105,13 +161,12 @@ export async function handlePOSTGameState(req: NextRequest) {
 
       if (userStatus) {
         const user = gameState.users.find(
-          (user) => user.userId === userStatus.userId
+          user => user.userId === userStatus.userId
         );
         if (user) {
           // 参照渡し
           user.isReady = userStatus.isReady;
-          gameState.isAllUsersReady = getAllReady(gameState.users);
-          await handleSetGameState(gameState);
+          handleGoToNextPhase(gameState);
         }
       }
       break;
@@ -122,7 +177,7 @@ export async function handlePOSTGameState(req: NextRequest) {
 }
 
 // DELETE -------------------------------------------------
-export async function handleDeleteGameState(req: NextRequest) {
+export async function handleDeleteGameState (req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get('gameId');
 
