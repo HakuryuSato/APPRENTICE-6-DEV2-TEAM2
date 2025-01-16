@@ -38,11 +38,6 @@ export async function handleSetGameState (gameState: GameState) {
   await kvSet(gameState.gameId, gameState);
 }
 
-// エラー処理用共通関数
-export function respondWithError (errorMessage: string, statusCode: number) {
-  return Response.json({ error: errorMessage }, { status: statusCode });
-}
-
 // 全ユーザーが準備完了済みか判定する関数
 export function getAllReady (users: UserStatus[]) {
   if (users.length !== 4) return false;
@@ -95,4 +90,3 @@ export function createGameState (gameId: string, userStatus: UserStatus) {
     images: {},
   } as GameState;
 }
-
