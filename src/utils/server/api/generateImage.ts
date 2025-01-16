@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { ImagesResponse } from 'openai/resources/images.js';
+import type { ImagesResponse,Image } from 'openai/resources/images.js';
 import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
 import { GameState, GeneratedImage } from '@/types/GameState';
 import { GenerateImageRequest, GenerateImage } from '@/types/GenerateImage';
@@ -29,7 +29,7 @@ export async function generateImage (
   const { prompt, userId, gameId, round } = request;
 
   // 引数が不足していればエラー
-  if (!prompt || !userId || !gameId || round === undefined)
+  if (!prompt || !userId || !gameId || !round)
     return responseWithError('Need prompt, userId, gameId, and round.', 400);
 
   // OpenAI APIで画像生成

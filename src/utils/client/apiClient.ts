@@ -58,7 +58,7 @@ export async function fetchGenerateImage ({
   return await handleFetchApi<GenerateImage>('/api/generate-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ generateImageRequest }),
+    body: JSON.stringify(generateImageRequest),
   });
 }
 
