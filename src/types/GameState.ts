@@ -2,7 +2,7 @@ import type { UserStatus } from './UserStatus';
 import type { GenerateImage } from './GenerateImage';
 
 export type GamePhase = 'prepare' | 'generate' | 'vote' | 'result';
-export type GameStateRequestType = 'create' | 'enter' | 'ready';
+export type GameStateRequestType = 'create' | 'enter' | 'ready' | 'vote';
 
 export interface GeneratedImage {
   url: string;
