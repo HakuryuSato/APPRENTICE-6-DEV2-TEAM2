@@ -67,13 +67,21 @@ export async function handleGameStateRequest (
     }
 
     case 'vote': {
-      if (!gameState) break;
-      // 投票先のuserIdを指定して
+      const targetUser = gameState.users.find(user => user.userId === voteTargetUserId);
+
+      // ユーザーが存在し、votedCountプロパティがあるか
+      if (!targetUser?.votedCount) return responseWithError('user not found in gameState, or does not have a valid votedCount property', 404);
+
+      // votedCountを+1して終了
+      targetUser.votedCount+=1
+      
+      break;
     }
   }
 
   // 最後に変更内容を反映したGameStateを返す
   const updatedGameState = await kvGet(gameId);
+
   if (!updatedGameState) {
     return createGameState(gameId, userStatus);
   }
