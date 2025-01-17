@@ -7,33 +7,37 @@ interface ThreeDButtonProps {
   firstText: string; // 1回目のテキスト
   secondText: string; // 2回目以降のテキスト
   handleEnter: () => void; // 2回目のタップ時に発火する関数
+  style?: React.CSSProperties; // スタイルプロパティ
+  initialImage?: string; // 初期画像のURL
+  afterClickImage?: string; // クリック後の画像のURL
 }
 
 export default function ThreeDButton({
   firstText,
   secondText,
   handleEnter,
+  style,
+  initialImage,
+  afterClickImage,
 }: ThreeDButtonProps) {
-  const [clickCount, setClickCount] = useState(0);
-
-  const handleFirstClick = () => {
-    setClickCount(1); // クリック回数を更新
-  };
-
-  const handleSecondClick = () => {
-    handleEnter(); // props から受け取った関数を実行
-    setClickCount((prev) => prev + 1); // クリック回数を更新
-  };
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <a
       href="#"
       className={`${styles.btn} ${styles['btn-3d-flip']} ${styles['btn-3d-flip2']}`}
-      onClick={clickCount === 0 ? handleFirstClick : handleSecondClick}
+      onClick={handleEnter}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <span className={styles['btn-3d-flip-box2']}>
         <span
           className={`${styles['btn-3d-flip-box-face']} ${styles['btn-3d-flip-box-face--front2']}`}
+          style={{
+            ...style,
+            backgroundColor: 'transparent',
+            backgroundImage: initialImage ? `url(${initialImage})` : style?.backgroundImage,
+          }}
         >
           {firstText}
           <FontAwesomeIcon
@@ -43,6 +47,11 @@ export default function ThreeDButton({
         </span>
         <span
           className={`${styles['btn-3d-flip-box-face']} ${styles['btn-3d-flip-box-face--back2']}`}
+          style={{
+            ...style,
+            backgroundColor: 'transparent',
+            backgroundImage: afterClickImage ? `url(${afterClickImage})` : style?.backgroundImage,
+          }}
         >
           {secondText}
           <FontAwesomeIcon
