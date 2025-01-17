@@ -6,9 +6,9 @@ export const useSignUp = () => {
   const [inputText, setInputText] = useState('');
 
   // グローバルステート群
-  const [topPageLayoutMode, setTopPageLayoutMode] = useAtom(topPageModeAtom);
-  const [userName, setUserName] = useAtom(userNameAtom);
-  const [userId, setUserId] = useAtom(userIdAtom);
+  const [, setTopPageLayoutMode] = useAtom(topPageModeAtom);
+  const [, setUserName] = useAtom(userNameAtom);
+  const [, setUserId] = useAtom(userIdAtom);
 
   const handleClickSubmit = () => {
     if (inputText !== '') {
