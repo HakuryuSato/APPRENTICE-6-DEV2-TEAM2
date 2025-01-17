@@ -22,6 +22,7 @@ export const Generate: React.FC = () => {
   const [round] = useAtom(roundAtom);
   const [theme, setTheme] = useState<string>('');
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [prompts, setPrompts] = useAtom(promptsAtom);
   const [gameId] = useAtom(gameIdAtom);
   const [userId] = useAtom(userIdAtom);
@@ -58,7 +59,9 @@ export const Generate: React.FC = () => {
       alert('テキストを入力してください');
       return;
     }
-    // 画像生成APIを呼び出しはまだ
+
+    setIsLoading(true);
+
     try {
       const translatePrompt = await fetchTranslatePrompt(inputText.trim());
       if (typeof translatePrompt === 'string') {
@@ -82,6 +85,8 @@ export const Generate: React.FC = () => {
       setIsGenerated(true);
     } catch (error) {
       console.error('Error generating image:', error);
+    } finally {
+      setIsLoading(false); // ローディング終了
     }
   };
 
@@ -110,13 +115,17 @@ export const Generate: React.FC = () => {
           />
           <p>{inputText.length} / 10 文字</p>
 
-          <Button onClick={handleClickGenerate} className="w-full rounded-lg">
-            生成する
+          <Button
+            onClick={handleClickGenerate}
+            className="w-full rounded-lg"
+            disabled={isLoading}
+          >
+            {isLoading ? '生成中...' : '生成する'}
           </Button>
         </>
       ) : (
         <>
-          <GeneratedImage className="text-xl font-bold mt-4" url={imageUrl} />
+          <GeneratedImage className="w-full" url={imageUrl} />
           <Button onClick={handleClickNext} className="w-full rounded-lg">
             みんなの画像を見にいこう！！
           </Button>
