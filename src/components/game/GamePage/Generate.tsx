@@ -12,13 +12,14 @@ import {
   gameIdAtom,
   gamePageModeAtom,
   promptsAtom,
+  roundAtom,
   userIdAtom,
 } from '@/atoms/state';
 
 export const Generate: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
-  const [round] = useState<number>(1);
+  const [round] = useAtom(roundAtom);
   const [theme, setTheme] = useState<string>('');
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [prompts, setPrompts] = useAtom(promptsAtom);
@@ -31,7 +32,7 @@ export const Generate: React.FC = () => {
       try {
         const gameState = await fetchGameState(gameId);
         if (gameState) {
-          const imageUrl = gameState.images[userId][round]?.url;
+          const imageUrl = gameState.images[userId][round - 1]?.url;
           setImageUrl(imageUrl);
           setTheme(gameState.targetTheme);
         }
@@ -40,7 +41,7 @@ export const Generate: React.FC = () => {
       }
     };
     fetchAndSetImage();
-  }, []);
+  }, [gameId]);
   // テーマをそのまま入れられないようにする？
   // 入力されたテキスト
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -117,7 +118,7 @@ export const Generate: React.FC = () => {
         <>
           <GeneratedImage className="text-xl font-bold mt-4" url={imageUrl} />
           <Button onClick={handleClickNext} className="w-full rounded-lg">
-            みんなの画像を見にいく
+            みんなの画像を見にいこう！！
           </Button>
         </>
       )}
