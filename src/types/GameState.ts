@@ -31,5 +31,5 @@ export interface GameStateRequest {
   gameId: string;
   gameStateRequestType: GameStateRequestType;
   userStatus: UserStatus;
-  voteTargetId?: UserStatus['userId'];
+  voteTargetUserId?: UserStatus['userId'];
 }

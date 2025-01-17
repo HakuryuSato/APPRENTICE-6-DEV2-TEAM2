@@ -8,7 +8,7 @@ import { targetThemes } from './targetThemes';
 export async function handleGameStateRequest (
   request: GameStateRequest
 ): Promise<GameState | Response> {
-  const { gameId, gameStateRequestType, userStatus } = request;
+  const { gameId, gameStateRequestType, userStatus, voteTargetUserId } = request;
 
   // gameIdまたはgameStateRequestTypeがなければエラー
   if (!gameId || !gameStateRequestType) {
@@ -66,10 +66,10 @@ export async function handleGameStateRequest (
       break;
     }
 
-    // case 'vote': {
-    //   if(!gameState) break;
-    //   // 投票先のuserIdを指定して
-    // }
+    case 'vote': {
+      if (!gameState) break;
+      // 投票先のuserIdを指定して
+    }
   }
 
   // 最後に変更内容を反映したGameStateを返す
