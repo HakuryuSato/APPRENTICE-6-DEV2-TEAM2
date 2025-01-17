@@ -30,7 +30,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${delaGothicOne.className} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
+      // 文字フォントの指定
+        className={`${pottaOne.className} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
       >
         {children}
       </body>
