@@ -27,8 +27,8 @@ export const Select: React.FC = () => {
         <ThreeDButton
             text="部屋を作る"
             handleEnter={handleClickCreate}
-            initialImage="/images/DoorClose.png"
-            onHoverImage="/images/DoorOpen.png"
+            initialImage="/images/SimpleHome.png"
+            onHoverImage="/images/SimpleHome.png"
           />
         </div>
         <div style={{ width: '200px', height: '200px' }}>
