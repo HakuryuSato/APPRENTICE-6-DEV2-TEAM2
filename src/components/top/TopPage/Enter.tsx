@@ -1,17 +1,17 @@
-import React from 'react';
-import { useAtom } from 'jotai';
+import React from "react";
+import { useAtom } from "jotai";
 import {
   gameIdAtom,
   topPageModeAtom,
   userIdAtom,
   userNameAtom,
-} from '@/atoms/state';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { fetchGameState, updateGameState } from '@/utils/client/apiClient';
-import { UserStatus } from '@/types/UserStatus';
+} from "@/atoms/state";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchGameState, updateGameState } from "@/utils/client/apiClient";
+import { UserStatus } from "@/types/UserStatus";
 
 export const Enter: React.FC = () => {
   const router = useRouter();
@@ -20,16 +20,16 @@ export const Enter: React.FC = () => {
   const [, setGameId] = useAtom(gameIdAtom);
   const [, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得
 
-  const [inputText, setInputText] = useState('');
-  const [errorText, setErrorText] = useState('');
+  const [inputText, setInputText] = useState("");
+  const [errorText, setErrorText] = useState("");
 
   const handleClickBack = () => {
-    setTemporaryTopPageLayoutMode({ mode: 'select' });
+    setTemporaryTopPageLayoutMode({ mode: "select" });
   };
 
   const handleClickSubmit = async () => {
     if (!inputText.trim()) {
-      setErrorText('ゲームIDを入力してください。');
+      setErrorText("ゲームIDを入力してください。");
       return;
     }
     try {
@@ -46,7 +46,7 @@ export const Enter: React.FC = () => {
 
       const response = await updateGameState({
         gameId: inputText.trim(),
-        gameStateRequestType: 'enter',
+        gameStateRequestType: "enter",
         userStatus,
       });
 
@@ -54,18 +54,26 @@ export const Enter: React.FC = () => {
         setGameId(inputText.trim());
         router.push(`/game/${inputText.trim()}`);
       } else {
-        setErrorText('ゲームの作成に失敗しました。もう一度お試しください。');
+        setErrorText("ゲームの作成に失敗しました。もう一度お試しください。");
       }
     } catch (error) {
-      console.error('エラー:', error);
+      console.error("エラー:", error);
       setErrorText(
-        'ゲームIDの確認中にエラーが発生しました。もう一度お試しください。'
+        "ゲームIDの確認中にエラーが発生しました。もう一度お試しください。",
       );
     }
   };
 
   return (
     <>
+      {/* 戻るボタン：親を無視して左4px,上4pxの位置に配置 */}
+      <Button
+        onClick={handleClickBack}
+        className="absolute top-4 left-4 hover:bg-primary/90"
+      >
+        戻る
+      </Button>
+
       <p>ニックネーム: {userName}</p>
 
       <h1>ゲームIDを入力してください</h1>
@@ -78,7 +86,6 @@ export const Enter: React.FC = () => {
       <p className="text-red-500">{errorText}</p>
       <div>
         <Button onClick={handleClickSubmit}>roomに入る</Button>
-        <Button onClick={handleClickBack}>戻る</Button>
       </div>
     </>
   );

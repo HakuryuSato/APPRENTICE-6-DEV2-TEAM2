@@ -1,7 +1,7 @@
-import React from 'react';
-import { useSignUp } from '@/hooks/top/TopPage/useSignUp';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { useSignUp } from "@/hooks/top/TopPage/useSignUp";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export const SignUp: React.FC = () => {
   const { inputText, setInputText, handleClickSubmit } = useSignUp();
