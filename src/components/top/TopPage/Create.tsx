@@ -75,7 +75,7 @@ export const Create: React.FC = () => {
       {/* 戻るボタン：親を無視して左4px,上4pxの位置に配置 */}
       <Button
         onClick={handleClickBack}
-        className="absolute top-4 left-4 hover:bg-primary/90"
+        className="absolute top-4 left-4 bg-fly-softPurple hover:bg-fly-blue text-black"
       >
         戻る
       </Button>
