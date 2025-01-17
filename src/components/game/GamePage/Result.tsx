@@ -1,59 +1,89 @@
+'use client';
 import Image from 'next/image';
-import React from 'react';
-import { GeneratedImage } from '../GeneratedImage';
+import React, { useEffect, useState } from 'react';
+import {
+  userNameAtom,
+  gamePageModeAtom,
+  gameIdAtom,
+  userIdAtom,
+} from '@/atoms/state';
 import { Button } from '@/components/ui/button';
 import { useResetState } from '@/hooks/top/TopPage/useResetState';
 import { useRouter } from 'next/navigation';
+import { fetchGameState } from '@/utils/client/apiClient';
+import DrawResult from './ResultPattern/DrawResult';
+import OnlyResult from './ResultPattern/OnlyResult';
+import { useAtom } from 'jotai';
+import { GameState } from '@/types/GameState';
+import { UserStatus } from '@/types/UserStatus';
+
+type User = UserStatus & {
+  vote: number; // 追加したい項目
+};
 
 export const Result: React.FC = () => {
-  const resetState = useResetState();  // フックをトップレベルで呼び出す
-  const router = useRouter();  // useRouter もトップレベルで呼び出す
+  // const [resultState, setResultState] = useState<GameState | null>(null); // 修正: 初期値を null に変更
+  // const resultUsers = resultState?.users || []; // デフォルト値を空配列に
+  // console.log(resultState);
 
+  // const [gameId] = useAtom(gameIdAtom);
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const response = await fetchGameState(gameId);
+  //       if (!response.ok) throw new Error('Failed to fetch users');
+  //       const data: GameState = await response.json(); // 修正: 型を GameState に指定
+  //       setResultState(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchUsers();
+  // }, [gameId]); // 修正: gameId を依存配列に追加
+
+  const resultUsers = [
+    { userId: 'user1', userName: 'Alice', vote: 2, isReady: true },
+    { userId: 'user2', userName: 'Bob', vote: 1, isReady: true },
+    { userId: 'user3', userName: 'Ciel', vote: 0, isReady: true },
+    { userId: 'user4', userName: 'Dave', vote: 1, isReady: true },
+  ]; // テスト用のダミーデータ
+
+  if (resultUsers.length === 0) {
+    return <p>Loading...</p>; // ロード中の表示
+  }
+
+  // 1位のユーザーを抽出
+  const sortedUsers = [...resultUsers].sort((a, b) => b.vote - a.vote);
+  const maxVote = sortedUsers[0].vote;
+
+  // 同率1位のユーザーをフィルタリング
+  const drawUsers = sortedUsers.filter((user) => user.vote === maxVote);
+  const otherUsers = sortedUsers.slice(drawUsers.length);
+
+  // ゲームリセットの処理
+  const resetState = useResetState(); // フックをトップレベルで呼び出す
+  const router = useRouter(); // useRouter もトップレベルで呼び出す
   const handleClickResetGame = () => {
-    resetState();  // 状態リセット
-    router.push('/');  // トップページに遷移
+    resetState(); // 状態リセット
+    router.push('/'); // トップページに遷移
   };
 
   return (
     <>
       <h1 className="font-semibold text-2xl">Result</h1>
+      {drawUsers.length > 1 ? (
+        // 同率1位が複数人いる場合
+        <DrawResult drawUsers={drawUsers} otherUsers={otherUsers} />
+      ) : (
+        // 1人だけ1位の場合
+        <OnlyResult firstUser={drawUsers[0]} otherUsers={otherUsers} />
+      )}
 
-      <div className="flex flex-col items-center rounded-lg">
-        <div className="flex flex-row items-center justify-center p-4 bg-fly-blue rounded-lg">
-          {/* <GeneratedImage imageUrl="https://source.unsplash.com/random/256x256" /> */}
-          <Image
-            // src={imageUrl}
-            src="https://images.unsplash.com/photo-1736159427273-189b0e49f19b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Generated Image"
-            className="rounded-md object-cover"
-            width={160}
-            height={160}
-          />
-          <div className="flex flex-col items-center justify-center pl-8">
-            <h3 className="text-2xl">Taro1234</h3>
-            <h3 className="font-semibold">1 point</h3>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col items-center rounded-lg">
-        <div className="flex flex-row items-center justify-center p-4 bg-fly-blue rounded-lg">
-          {/* <GeneratedImage imageUrl="https://source.unsplash.com/random/256x256" /> */}
-          <Image
-            // src={imageUrl}
-            src="https://images.unsplash.com/photo-1736159427273-189b0e49f19b?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Generated Image"
-            className="rounded-md object-cover"
-            width={160}
-            height={160}
-          />
-          <div className="flex flex-col items-center justify-center pl-8">
-            <h3 className="text-2xl">Taro1234</h3>
-            <h3 className="font-semibold">1 point</h3>
-          </div>
-        </div>
-      </div>
-
-      <Button onClick={handleResetState} className="mt-4 p-2 bg-fly-purple text-white rounded-lg">
+      <Button
+        onClick={handleClickResetGame}
+        className="mt-4 p-2 bg-fly-purple text-white rounded-lg"
+      >
         end game
       </Button>
     </>
