@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export const Select: React.FC = () => {
   const [userName] = useAtom(userNameAtom);
-  const [temporaryTopPageLayoutMode, setTemporaryTopPageLayoutMode] = useAtom(
+  const [, setTemporaryTopPageLayoutMode] = useAtom(
     topPageModeAtom,
   ); // グローバルステートから取得
 
