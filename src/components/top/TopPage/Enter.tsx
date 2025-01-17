@@ -69,23 +69,25 @@ export const Enter: React.FC = () => {
       {/* 戻るボタン：親を無視して左4px,上4pxの位置に配置 */}
       <Button
         onClick={handleClickBack}
-        className="absolute top-4 left-4 hover:bg-primary/90"
+        className="absolute top-4 left-4"
       >
         戻る
       </Button>
 
       <p>ニックネーム: {userName}</p>
 
-      <h1>ゲームIDを入力してください</h1>
+      <h1>あいことばを入力してね</h1>
       <Input
         type="text"
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}
-        placeholder="ゲームID"
+        placeholder="あいことば"
       />
+      <h2>*一緒に遊ぶには同じあいことばが必要です</h2>
       <p className="text-red-500">{errorText}</p>
+
       <div>
-        <Button onClick={handleClickSubmit}>roomに入る</Button>
+        <Button onClick={handleClickSubmit}>部屋に入る</Button>
       </div>
     </>
   );

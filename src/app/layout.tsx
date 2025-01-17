@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Potta_One } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/styles/theme-provider"
 
 
 const pottaOne = Potta_One({
