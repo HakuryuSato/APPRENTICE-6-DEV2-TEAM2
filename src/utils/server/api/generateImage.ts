@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { ImagesResponse,Image } from 'openai/resources/images.js';
+import type { ImagesResponse, Image } from 'openai/resources/images.js';
 import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
 import { GameState, GeneratedImage } from '@/types/GameState';
 import { GenerateImageRequest, GenerateImage } from '@/types/GenerateImage';
@@ -20,12 +20,8 @@ interface OpenAiImageRequest {
   size: ImageSize;
 }
 
-
-
 // POST
-export async function generateImage (
-  req: NextRequest
-): Promise<GenerateImage> {
+export async function generateImage(req: NextRequest): Promise<GenerateImage> {
   // リクエストから必要なデータを取得
   const body: GenerateImageRequest = await req.json();
 
@@ -55,13 +51,11 @@ export async function generateImage (
         404
       );
 
-
     // 非同期で画像をGameStateに追加
     insertImageUrlToGameState(imageUrl, userId, gameId, round);
 
     // 先にurlを返す
     return { url: imageUrl };
-
   } catch (error) {
     console.error(
       'Image generation error:',
@@ -72,7 +66,7 @@ export async function generateImage (
 }
 
 // GameStateに画像urlを保存するための関数
-async function insertImageUrlToGameState (
+async function insertImageUrlToGameState(
   url: string,
   userId: string,
   gameId: string,
@@ -92,10 +86,11 @@ async function insertImageUrlToGameState (
       currentGameState.images[userId] = [];
     }
 
-
     // 現在のラウンドが配列の長さと一致することを確認
-    if (round !== currentGameState.images[userId].length) {
-      throw new Error(`Invalid round number: Expected round ${currentGameState.images[userId].length}, got ${round}`);
+    if (round - 1 !== currentGameState.images[userId].length) {
+      throw new Error(
+        `Invalid round number: Expected round ${currentGameState.images[userId].length}, got ${round}`
+      );
     }
 
     // GeneratedImage型のオブジェクトを配列に追加
