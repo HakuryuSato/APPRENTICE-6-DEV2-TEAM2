@@ -18,7 +18,7 @@ export const Create: React.FC = () => {
   const [userName] = useAtom(userNameAtom);
   const [userId] = useAtom(userIdAtom);
   const [, setGameId] = useAtom(gameIdAtom);
-  const [, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから取得
+  const [, setTemporaryTopPageLayoutMode] = useAtom(topPageModeAtom);
 
   const [inputText, setInputText] = useState("");
   const [errorText, setErrorText] = useState("");
