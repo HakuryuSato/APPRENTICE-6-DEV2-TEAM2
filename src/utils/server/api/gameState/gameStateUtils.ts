@@ -1,6 +1,7 @@
-import type { GameState } from '@/types/GameState';
+import type { GameState, GameStateRequest } from '@/types/GameState';
 import type { UserStatus } from '@/types/UserStatus';
-import { kvSet } from '@/utils/server/vercelKVHandler';
+import { responseWithError } from '../../responseWithError';
+import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
 import { targetThemes } from './targetThemes';
 
 // 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数
@@ -79,8 +80,77 @@ export function addUserToGameState(gameState: GameState, userStatus: UserStatus)
   gameState.images[userStatus.userId] = [];
 }
 
+// GameStateRequestの処理を行う関数
+export async function handleGameStateRequest(request: GameStateRequest): Promise<GameState | Response> {
+  const { gameId, gameStateRequestType, userStatus } = request;
+
+  // gameIdまたはgameStateRequestTypeがなければエラー
+  if (!gameId || !gameStateRequestType) {
+    return responseWithError('Missing gameId', 400);
+  }
+
+  // gameStateの取得
+  let gameState = await kvGet(gameId) as GameState;
+
+  // create以外でGameStateが存在しないならエラー
+  if (!gameState && gameStateRequestType !== 'create') {
+    return responseWithError('Missing GameState', 400);
+  }
+
+  // RequestTypeに応じて処理
+  switch (gameStateRequestType) {
+    // 作成
+    case 'create': {
+      // 既にgameStateが存在するならば終了
+      if (gameState) break;
+
+      // 存在しないならば作成
+      gameState = createGameState(gameId, userStatus);
+      addUserToGameState(gameState, userStatus);
+      await kvSet(gameId, gameState);
+      break;
+    }
+
+    // ユーザーの追加
+    case 'enter': {
+      // userIdまたはuserNameがなければエラー
+      if (!userStatus?.userId || !userStatus?.userName) {
+        return responseWithError('playerInfo not found', 404);
+      }
+
+      addUserToGameState(gameState, userStatus);
+      handleGoToNextPhase(gameState);
+      break;
+    }
+
+    // ユーザーの準備完了
+    case 'ready': {
+      // GameStateが存在しないなら終了
+      if (!gameState) break;
+
+      if (userStatus) {
+        const user = gameState.users.find(
+          user => user.userId === userStatus.userId
+        );
+        if (user) {
+          user.isReady = userStatus.isReady;
+          handleGoToNextPhase(gameState);
+        }
+      }
+      break;
+    }
+  }
+
+  // 最後に変更内容を反映したGameStateを返す
+  const updatedGameState = await kvGet(gameId);
+  if (!updatedGameState) {
+    return createGameState(gameId, userStatus);
+  }
+  return updatedGameState as GameState;
+}
+
 // GameStateを初期化して作成する関数
-export function createGameState (gameId: string, userStatus: UserStatus) {
+export function createGameState(gameId: string, userStatus: UserStatus) {
   return {
     gameId: gameId,
     round: 0, // 0が最初の部屋入室、1以降がゲーム
