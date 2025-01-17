@@ -2,6 +2,7 @@ import React from 'react';
 import { useAtom } from 'jotai';
 import { topPageModeAtom, userNameAtom } from '@/atoms/state';
 import ThreeDButton from '@/components/3DButton/3DButton';
+import { Button } from '@/components/ui/button';
 
 export const Select: React.FC = () => {
   const [userName] = useAtom(userNameAtom);
@@ -21,24 +22,40 @@ export const Select: React.FC = () => {
   return (
     <>
       <p>ニックネーム: {userName}</p>
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '2rem' }}>
+        <div style={{ width: '200px', height: '200px' }}>
         <ThreeDButton
-          firstText="ルームを作る"
-          secondText="作成する"
-          handleEnter={handleClickCreate}
-        />
-        <ThreeDButton
-          firstText="ルームに入る"
-          secondText="入室する"
-          handleEnter={handleClickEnter}
-        />
+            firstText="部屋を作る"
+            secondText="部屋を作る"
+            handleEnter={handleClickCreate}
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+            initialImage="/images/DoorClose.png"
+            afterClickImage="/images/DoorOpen.png"
+          />
+        </div>
+        <div style={{ width: '200px', height: '200px' }}>
+          <ThreeDButton
+            firstText="部屋に入る"
+            secondText="部屋に入る"
+            handleEnter={handleClickEnter}
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+            initialImage="/images/DoorClose.png"
+            afterClickImage="/images/DoorOpen.png"
+          />
+        </div>
       </div>
-      <div style={{ marginTop: '1rem' }}>
-        <ThreeDButton
-          firstText="戻る"
-          secondText="戻る"
-          handleEnter={handleClickBack}
-        />
+      <div style={{ textAlign: 'center' }}>
+        <Button onClick={handleClickBack}>戻る</Button>
       </div>
     </>
   );
