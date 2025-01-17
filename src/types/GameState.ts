@@ -4,7 +4,6 @@ import type { GenerateImage } from './GenerateImage';
 export type GamePhase = 'prepare' | 'generate' | 'vote' | 'result';
 export type GameStateRequestType = 'create' | 'enter' | 'ready';
 
-
 export interface GeneratedImage {
   url: string;
   isError: boolean;
@@ -18,8 +17,8 @@ export interface GameState {
   users: UserStatus[];
   isAllUsersReady: boolean;
   images: {
-    [userId:string] : GeneratedImage[];  // ←辞書でユーザごとに生成した画像を格納したほうが後々便利だと思ったので定義を少し変えました。
-  }
+    [userId: string]: GeneratedImage[]; // ←辞書でユーザごとに生成した画像を格納したほうが後々便利だと思ったので定義を少し変えました。
+  };
 }
 
 /* 使用例 ⇨　images[userId][roundCount].url
@@ -28,10 +27,9 @@ export interface GameState {
    images[ユーザーID][ラウンド数].error
 */
 
-
-
 export interface GameStateRequest {
   gameId: string;
   gameStateRequestType: GameStateRequestType;
   userStatus: UserStatus;
+  voteTargetId?: UserStatus['userId'];
 }
