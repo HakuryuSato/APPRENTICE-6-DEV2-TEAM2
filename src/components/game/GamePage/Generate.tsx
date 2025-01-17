@@ -64,25 +64,28 @@ export const Generate: React.FC = () => {
 
     try {
       const translatePrompt = await fetchTranslatePrompt(inputText.trim());
-      if (typeof translatePrompt === 'string') {
-        setPrompts((prev) => [...prev, translatePrompt]);
+      console.log('変換済み:', translatePrompt);
+      if (
+        translatePrompt &&
+        typeof translatePrompt === 'object' &&
+        'text' in translatePrompt
+      ) {
+        const finalPrompt = prompts + translatePrompt.text;
+
+        console.log('送信するプロンプト:', finalPrompt);
+
+        const GeneratedResultImage = await fetchGenerateImage({
+          gameId: gameId,
+          round: round,
+          userId: userId,
+          prompt: finalPrompt,
+        });
+
+        setPrompts(finalPrompt);
+
+        setImageUrl(GeneratedResultImage?.url || '');
+        setIsGenerated(true);
       }
-
-      const finalPrompt = [...prompts, translatePrompt].join(' + ');
-      console.log('送信するプロンプト:', finalPrompt);
-
-      const GeneratedResultImage = await fetchGenerateImage({
-        gameId: gameId,
-        round: round,
-        userId: userId,
-        prompt: finalPrompt,
-      });
-
-      if (typeof translatePrompt === 'string') {
-        setPrompts((prev) => [...prev, translatePrompt]);
-      }
-      setImageUrl(GeneratedResultImage?.url || '');
-      setIsGenerated(true);
     } catch (error) {
       console.error('Error generating image:', error);
     } finally {
