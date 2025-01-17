@@ -12,29 +12,13 @@ export const TopPage: React.FC = () => {
   const [temporaryTopPageLayoutMode] = useAtom(topPageModeAtom); // グローバルステートから現在のモードを取得
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        flexDirection: 'column', // ここで縦並びに設定
-      }}
-    >
-      <div>
-        {/* モードが 'sign-up' の場合に SignUp コンポーネントを表示 */}
-        {temporaryTopPageLayoutMode?.mode === 'sign-up' && <SignUp />}
-        {temporaryTopPageLayoutMode?.mode === 'select' && <Select />}
-        {temporaryTopPageLayoutMode?.mode === 'create' && <Create />}
-        {temporaryTopPageLayoutMode?.mode === 'enter' && <Enter />}
-      </div>
-      <div
-        style={{
-          marginTop: '20px', // 上のコンポーネントとの間隔を追加
-        }}
-      >
-        <GlobalState />
-      </div>
+    <div className="flex flex-col justify-center items-center h-screen space-y-4 p-4">
+      {/* モードが 'sign-up' の場合に SignUp コンポーネントを表示 */}
+      {temporaryTopPageLayoutMode?.mode === 'sign-up' && <SignUp />}
+      {temporaryTopPageLayoutMode?.mode === 'select' && <Select />}
+      {temporaryTopPageLayoutMode?.mode === 'create' && <Create />}
+      {temporaryTopPageLayoutMode?.mode === 'enter' && <Enter />}
     </div>
+    //   <GlobalState />
   );
 };

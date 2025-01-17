@@ -65,7 +65,7 @@ export const Enter: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <>
       <p>ニックネーム: {userName}</p>
 
       <h1>ゲームIDを入力してください</h1>
@@ -74,16 +74,13 @@ export const Enter: React.FC = () => {
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}
         placeholder="ゲームID"
-        className="w-[300px]"
       />
       <p className="text-red-500">{errorText}</p>
-      <div className="flex gap-4">
+      <div>
         <Button onClick={handleClickSubmit}>roomに入る</Button>
-        <Button className="bg-slate-500" onClick={handleClickBack}>
-          戻る
-        </Button>
+        <Button onClick={handleClickBack}>戻る</Button>
       </div>
-    </div>
+    </>
   );
 };
 
