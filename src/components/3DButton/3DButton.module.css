@@ -88,7 +88,7 @@
   left: 100%;
   transform: translateX(-1px) rotateY(90deg);
   transform-origin: 0 0;
-  color: #fff;
+  color: #000;
   border: 2px solid #000;
   background: #000;
   background-position: center;
@@ -99,6 +99,7 @@
   position: absolute;
   top: calc(50% - 0.5em);
   right: 1rem;
+  font-size: 1.2rem;
 }
 
 /* テキストの背景を追加して読みやすくする */
