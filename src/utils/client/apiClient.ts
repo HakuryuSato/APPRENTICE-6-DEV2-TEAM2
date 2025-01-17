@@ -94,11 +94,13 @@ export async function updateGameState ({
   gameId,
   gameStateRequestType,
   userStatus,
+  voteTargetUserId,
 }: GameStateRequest): Promise<GameState | null> {
   const gameStateRequest = {
     gameId,
     gameStateRequestType,
     userStatus,
+    voteTargetUserId,
   };
   return await handleFetchApi<GameState | null>(`/api/game-state`, {
     method: 'POST',

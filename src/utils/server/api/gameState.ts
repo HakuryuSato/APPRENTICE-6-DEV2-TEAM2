@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { GameState, GameStateRequest } from '@/types/GameState';
 import { kvGet, kvSet, kvDel } from '@/utils/server/vercelKVHandler';
-import {
-  addUserToGameState,
-  createGameState,
-  handleGoToNextPhase,
-} from './gameState/gameStateUtils';
+import { handleGameStateRequest } from './gameState/gameStateUtils';
 import { responseWithError } from '../responseWithError';
 
 // HTTPリクエストごとの処理 ---------------------------------------------------------------------------------------------------
@@ -26,71 +22,9 @@ export async function handleGetGameState (req: NextRequest) {
 }
 
 // POST  -------------------------------------------------
-export async function handlePOSTGameState (req: NextRequest) {
-  // 展開
-  const { gameId, gameStateRequestType, userStatus } =
-    (await req.json()) as GameStateRequest;
-
-  // gameIdまたはgameStateRequestTypeがなければエラー
-  if (!gameId || !gameStateRequestType) {
-    return responseWithError('Missing gameId', 400);
-  }
-
-  // gameStateの取得
-  let gameState = (await kvGet(gameId)) as GameState;
-
-  // create以外でGameStateが存在しないならエラー
-  if (!gameState && gameStateRequestType !== 'create') {
-    return responseWithError('Missing GameState', 400);
-  }
-
-  // RequestTypeに応じて処理
-  switch (gameStateRequestType) {
-    // 作成
-    case 'create': {
-      // 既にgameStateが存在するならば終了
-      if (gameState) break;
-
-      // 存在しないならば作成
-      gameState = createGameState(gameId, userStatus);
-      addUserToGameState(gameState, userStatus);
-      await kvSet(gameId, gameState);
-      break;
-    }
-
-    // ユーザーの追加
-    case 'enter': {
-      // userIdまたはuserNameがなければエラー
-      if (!userStatus.userId || !userStatus.userName) {
-        return responseWithError('playerInfo not found', 404);
-      }
-
-      addUserToGameState(gameState, userStatus);
-
-      handleGoToNextPhase(gameState);
-      break;
-    }
-
-    // ユーザーの準備完了
-    case 'ready': {
-      // GameStateが存在しないなら終了
-      if (!gameState) break;
-
-      if (userStatus) {
-        const user = gameState.users.find(
-          user => user.userId === userStatus.userId
-        );
-        if (user) {
-          // 参照渡し
-          user.isReady = userStatus.isReady;
-          handleGoToNextPhase(gameState);
-        }
-      }
-      break;
-    }
-  }
-  // 最後に変更内容を反映したGameStateまたはnull返す
-  return (await kvGet(gameId)) ?? null;
+export async function handlePOSTGameState(req: NextRequest) {
+  const request = await req.json() as GameStateRequest;
+  return handleGameStateRequest(request);
 }
 
 // DELETE -------------------------------------------------
