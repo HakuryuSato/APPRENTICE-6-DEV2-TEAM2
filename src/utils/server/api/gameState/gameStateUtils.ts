@@ -66,7 +66,7 @@ export async function handleGameStateRequest (
       break;
     }
 
-    // case 'vote': { 
+    // case 'vote': {
     //   if(!gameState) break;
     //   // 投票先のuserIdを指定して
     // }
@@ -124,6 +124,7 @@ export function addUserToGameState (
     userId: userStatus.userId,
     userName: userStatus.userName,
     isReady: true,
+    votedCount: 0,
   });
 
   // ユーザーの画像配列を初期化
