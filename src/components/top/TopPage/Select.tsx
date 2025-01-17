@@ -25,32 +25,18 @@ export const Select: React.FC = () => {
       <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '2rem' }}>
         <div style={{ width: '200px', height: '200px' }}>
         <ThreeDButton
-            firstText="部屋を作る"
-            secondText="部屋を作る"
+            text="部屋を作る"
             handleEnter={handleClickCreate}
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
             initialImage="/images/DoorClose.png"
-            afterClickImage="/images/DoorOpen.png"
+            onHoverImage="/images/DoorOpen.png"
           />
         </div>
         <div style={{ width: '200px', height: '200px' }}>
           <ThreeDButton
-            firstText="部屋に入る"
-            secondText="部屋に入る"
+            text="部屋に入る"
             handleEnter={handleClickEnter}
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
             initialImage="/images/DoorClose.png"
-            afterClickImage="/images/DoorOpen.png"
+            onHoverImage="/images/DoorOpen.png"
           />
         </div>
       </div>
