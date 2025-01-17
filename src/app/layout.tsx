@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Potta_One } from 'next/font/google';
 import './globals.css';
+import { ThemeProvider } from "@/components/theme-provider"
 
 
 const pottaOne = Potta_One({
@@ -19,12 +20,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
       // 文字フォントの指定
         className={`${pottaOne.className} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
