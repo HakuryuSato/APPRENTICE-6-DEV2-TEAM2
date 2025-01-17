@@ -1,21 +1,22 @@
-'use client';
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+"use client";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import {
-  userNameAtom,
-  gamePageModeAtom,
   gameIdAtom,
+  gamePageModeAtom,
   userIdAtom,
-} from '@/atoms/state';
-import { Button } from '@/components/ui/button';
-import { useResetState } from '@/hooks/top/TopPage/useResetState';
-import { useRouter } from 'next/navigation';
-import { fetchGameState } from '@/utils/client/apiClient';
-import DrawResult from './ResultPattern/DrawResult';
-import OnlyResult from './ResultPattern/OnlyResult';
-import { useAtom } from 'jotai';
-import { GameState } from '@/types/GameState';
-import { UserStatus } from '@/types/UserStatus';
+  userNameAtom,
+} from "@/atoms/state";
+import { Button } from "@/components/ui/button";
+import { useResetState } from "@/hooks/top/TopPage/useResetState";
+import { useRouter } from "next/navigation";
+import { fetchGameState } from "@/utils/client/apiClient";
+import DrawResult from "./ResultPattern/DrawResult";
+import OnlyResult from "./ResultPattern/OnlyResult";
+import { useAtom } from "jotai";
+import { GameState } from "@/types/GameState";
+import { UserStatus } from "@/types/UserStatus";
+import { useResetVercelKV } from "@/hooks/top/TopPage/useResetVercelKV";
 
 type User = UserStatus & {
   vote: number; // 追加したい項目
@@ -43,10 +44,10 @@ export const Result: React.FC = () => {
   // }, [gameId]); // 修正: gameId を依存配列に追加
 
   const resultUsers = [
-    { userId: 'user1', userName: 'Alice', vote: 2, isReady: true },
-    { userId: 'user2', userName: 'Bob', vote: 1, isReady: true },
-    { userId: 'user3', userName: 'Ciel', vote: 0, isReady: true },
-    { userId: 'user4', userName: 'Dave', vote: 1, isReady: true },
+    { userId: "user1", userName: "Alice", vote: 2, isReady: true },
+    { userId: "user2", userName: "Bob", vote: 1, isReady: true },
+    { userId: "user3", userName: "Ciel", vote: 0, isReady: true },
+    { userId: "user4", userName: "Dave", vote: 1, isReady: true },
   ]; // テスト用のダミーデータ
 
   if (resultUsers.length === 0) {
@@ -64,21 +65,30 @@ export const Result: React.FC = () => {
   // ゲームリセットの処理
   const resetState = useResetState(); // フックをトップレベルで呼び出す
   const router = useRouter(); // useRouter もトップレベルで呼び出す
+  
+  // vercelKVの削除用
+  const { resetVercelKV } = useResetVercelKV();
+  const [gameId] = useAtom(gameIdAtom)
+
+
   const handleClickResetGame = () => {
+    resetVercelKV(gameId) // 該当GameIDの情報をVercelKVから削除
     resetState(); // 状態リセット
-    router.push('/'); // トップページに遷移
+    router.push("/"); // トップページに遷移
   };
 
   return (
     <>
       <h1 className="font-semibold text-2xl">Result</h1>
-      {drawUsers.length > 1 ? (
-        // 同率1位が複数人いる場合
-        <DrawResult drawUsers={drawUsers} otherUsers={otherUsers} />
-      ) : (
-        // 1人だけ1位の場合
-        <OnlyResult firstUser={drawUsers[0]} otherUsers={otherUsers} />
-      )}
+      {drawUsers.length > 1
+        ? (
+          // 同率1位が複数人いる場合
+          <DrawResult drawUsers={drawUsers} otherUsers={otherUsers} />
+        )
+        : (
+          // 1人だけ1位の場合
+          <OnlyResult firstUser={drawUsers[0]} otherUsers={otherUsers} />
+        )}
 
       <Button
         onClick={handleClickResetGame}
