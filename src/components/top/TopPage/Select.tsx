@@ -1,7 +1,7 @@
-// 形式のため作りましたが、不要であれば削除してください。import React from 'react';
+import React from 'react';
 import { useAtom } from 'jotai';
 import { topPageModeAtom, userNameAtom } from '@/atoms/state';
-import { Button } from '@/components/ui/button';
+import ThreeDButton from '@/components/3DButton/3DButton';
 
 export const Select: React.FC = () => {
   const [userName] = useAtom(userNameAtom);
@@ -21,11 +21,25 @@ export const Select: React.FC = () => {
   return (
     <>
       <p>ニックネーム: {userName}</p>
-      <div>
-        <Button onClick={handleClickCreate}>ルームを作る</Button>
-        <Button onClick={handleClickEnter}>ルームに入る</Button>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <ThreeDButton
+          firstText="ルームを作る"
+          secondText="作成する"
+          handleEnter={handleClickCreate}
+        />
+        <ThreeDButton
+          firstText="ルームに入る"
+          secondText="入室する"
+          handleEnter={handleClickEnter}
+        />
       </div>
-      <Button onClick={handleClickBack}>戻る</Button>
+      <div style={{ marginTop: '1rem' }}>
+        <ThreeDButton
+          firstText="戻る"
+          secondText="戻る"
+          handleEnter={handleClickBack}
+        />
+      </div>
     </>
   );
 };
