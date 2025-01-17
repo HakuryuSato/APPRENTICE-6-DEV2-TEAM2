@@ -8,7 +8,7 @@ export const SignUp: React.FC = () => {
 
   return (
     <>
-      <h1>ニックネームの入力</h1>
+      <h1>ニックネームを入力してね</h1>
       <Input
         type="text"
         value={inputText}

@@ -54,12 +54,12 @@ export const Enter: React.FC = () => {
         setGameId(inputText.trim());
         router.push(`/game/${inputText.trim()}`);
       } else {
-        setErrorText("ゲームの作成に失敗しました。もう一度お試しください。");
+        setErrorText("部屋の作成に失敗しました。もう一度お試しください。");
       }
     } catch (error) {
       console.error("エラー:", error);
       setErrorText(
-        "ゲームIDの確認中にエラーが発生しました。もう一度お試しください。",
+        "あいことばの確認中にエラーが発生しました。もう一度お試しください。",
       );
     }
   };

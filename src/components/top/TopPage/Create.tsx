@@ -29,7 +29,7 @@ export const Create: React.FC = () => {
 
   const handleClickSubmit = async () => {
     if (!inputText.trim()) {
-      setErrorText("任意のゲームIDを入力してください。");
+      setErrorText("あいことばを入力してください");
       return;
     }
 
