@@ -1,13 +1,23 @@
 import { useBgm } from '@/context/BgmContext';
+import { PlayIcon, PauseIcon, MusicalNoteIcon  } from '@heroicons/react/24/solid';
+import { Button } from './ui/button';
+
 
 export default function BgmController() {
   const { isPlaying, togglePlay, setVolume } = useBgm();
 
   return (
-    <div className="p-4 fixed bottom-4 right-4 text-white rounded-lg shadow-md">
-      <button onClick={togglePlay} className="px-4 py-2 bg-fly-navy rounded">
-        {isPlaying ? 'Pause BGM' : 'Play BGM'}
-      </button>
+    <div className="p-4 fixed bottom-4 right-4 rounded-lg">
+       
+      <Button onClick={togglePlay} className="flex w-20 bg-fly-softPurple shadow-md">
+        <MusicalNoteIcon className="text-fly-navy"/>
+        {/* {isPlaying ? 'Pause BGM ICH' : 'Play BGM'} */}
+        {isPlaying ? (
+        <PauseIcon className="text-fly-navy" />
+      ) : (
+        <PlayIcon className="text-fly-navy" />
+      )}
+      </Button>
       {/* <div className="mt-2">
         <label htmlFor="volume" className="block text-sm">
           Volume
