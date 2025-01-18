@@ -6,6 +6,7 @@ import {
   fetchGameState,
   fetchGenerateImage,
   fetchTranslatePrompt,
+  updateGameState,
 } from '@/utils/client/apiClient';
 import { useAtom } from 'jotai';
 import {
@@ -14,6 +15,7 @@ import {
   promptsAtom,
   roundAtom,
   userIdAtom,
+  userNameAtom,
 } from '@/atoms/state';
 
 export const Generate: React.FC = () => {
@@ -26,6 +28,7 @@ export const Generate: React.FC = () => {
   const [prompts, setPrompts] = useAtom(promptsAtom);
   const [gameId] = useAtom(gameIdAtom);
   const [userId] = useAtom(userIdAtom);
+  const [userName] = useAtom(userNameAtom);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
 
   useEffect(() => {
@@ -93,7 +96,19 @@ export const Generate: React.FC = () => {
     }
   };
 
-  const handleClickNext = () => {
+  const handleClickNext = async () => {
+    const userStatus = {
+      userId: userId,
+      userName: userName,
+      isReady: true,
+    };
+
+    await updateGameState({
+      gameId: gameId,
+      gameStateRequestType: 'ready',
+      userStatus,
+    });
+
     setTemporaryTopGameLayoutMode({ mode: 'vote' });
   };
 
