@@ -55,11 +55,18 @@ export async function fetchGenerateImage ({
     userId,
     prompt,
   };
-  return await handleFetchApi<GenerateImage>('/api/generate-image', {
+
+  const result = await handleFetchApi<GenerateImage>('/api/generate-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(generateImageRequest),
   });
+
+  if (!result.url) {
+    //再帰で再取得を行う。
+    return await fetchGenerateImage(generateImageRequest);
+  }
+  return result;
 }
 
 // プロンプトを英語に翻訳 --------------------------------------------------
