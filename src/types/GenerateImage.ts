@@ -10,6 +10,7 @@ export interface GenerateImageRequest {
   round: GameState['round']
   userId: UserStatus['userId']
   prompt: string;
+  recursiv_limt?:number;
 }
 
 export interface GeneratedImageProps extends GenerateImage {

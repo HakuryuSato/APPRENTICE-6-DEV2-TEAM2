@@ -42,6 +42,8 @@ async function handleFetchApi<T> (
   }
 }
 
+
+
 // プロンプトから画像生成 -------------------------------------------------
 export async function fetchGenerateImage ({
   gameId,
@@ -56,17 +58,16 @@ export async function fetchGenerateImage ({
     prompt,
   };
 
-  const result = await handleFetchApi<GenerateImage>('/api/generate-image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(generateImageRequest),
-  });
-
-  if (!result.url) {
-    //再帰で再取得を行う。
-    return await fetchGenerateImage(generateImageRequest);
+  //再帰だと無限にループしてしまうので、5回トライするように変更
+  for (let i = 0;i < 5;i++) {
+    let result = await handleFetchApi<GenerateImage>('/api/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(generateImageRequest),
+    });
+    if (result.url){ return result}
   }
-  return result;
+  return null
 }
 
 // プロンプトを英語に翻訳 --------------------------------------------------
