@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 
 
 export default function BgmController() {
-  const { isPlaying, togglePlay, setVolume } = useBgm();
+  const { isPlaying, togglePlay } = useBgm();
 
   return (
     <div className="p-4 fixed bottom-4 right-4 rounded-lg">
