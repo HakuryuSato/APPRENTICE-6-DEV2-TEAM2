@@ -15,7 +15,7 @@ export const SignUp: React.FC = () => {
         onChange={(e) => setInputText(e.target.value)}
         placeholder="ニックネーム"
       />
-      <Button onClick={handleClickSubmit}>はじめる</Button>
+      <Button className="" onClick={handleClickSubmit}>はじめる</Button>
     </>
   );
 };

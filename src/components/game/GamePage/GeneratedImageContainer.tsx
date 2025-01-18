@@ -49,8 +49,8 @@ export const GeneratedImageContainer: React.FC = () => {
       className="flex flex-col items-center justify-center h-screen space-y-4 p-4"
       onClick={handleBackgroundClick}
     >
-      <div>投票タイム！！！</div>
-      <div>画像を選んで投票してね！</div>
+      <div className='font-semibold text-2xl mb-2'>投票タイム！！！</div>
+      <div >画像を選んで投票してね！</div>
       <div
         className="grid grid-cols-2 gap-4 w-full"
         onClick={(e) => e.stopPropagation()} // 背景クリックの伝播を防ぐ
@@ -58,14 +58,14 @@ export const GeneratedImageContainer: React.FC = () => {
         {userIds.map((value, index) => (
           <div
             key={index}
-            className={`flex flex-col items-center space-y-4 ${
+            className={`flex flex-col items-center p-2 bg-fly-softPurple rounded-lg shadow-md space-y-4 ${
               isDisabled(value, index) ? 'opacity-50' : ''
             }`}
             role="button"
             onClick={() => handleTap(value, index)}
           >
             <div className="relative w-full h-full rounded-md overflow-hidden">
-              <GeneratedImage className="" url={imageUrl} />
+              <GeneratedImage className="w-36" url={imageUrl} />
               {isVoteOverlayVisible(value, index) && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">投票する</span>
