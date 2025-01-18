@@ -19,7 +19,7 @@ export const GeneratedImageContainer: React.FC = () => {
   const [round, setRound] = useAtom(roundAtom);
   const [isAllUsersReady, setIsAllUsersReady] = useState<boolean>(false);
   const [roundImages, setRoundImages] = useState<
-    { userId: string; imageUrl: string }[]
+    { userId: string; imageUrl: string; userName: string }[]
   >([]);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
   const [selectedVoteImage, setSelectedVoteImage] = useState<number | null>(
