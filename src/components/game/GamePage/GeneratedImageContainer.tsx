@@ -90,8 +90,8 @@ export const GeneratedImageContainer: React.FC = () => {
     setTemporaryTopGameLayoutMode({ mode: 'generate' });
   };
 
-  const handleVoted = (
-    value: { userId: string; imageUrl: string },
+  const handleVoted = async (
+    value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
     console.log(`Vote ${index + 1} clicked!`);
@@ -101,12 +101,19 @@ export const GeneratedImageContainer: React.FC = () => {
       userName: userName,
       isReady: true,
     };
-    updateGameState({
+    await updateGameState({
       gameId: gameId,
       gameStateRequestType: 'vote',
       userStatus,
       voteTargetUserId: value.userId,
     });
+
+    await updateGameState({
+      gameId: gameId,
+      gameStateRequestType: 'ready',
+      userStatus,
+    });
+
     setIsAllUsersReady(false);
     startVotePolling();
   };
@@ -117,11 +124,13 @@ export const GeneratedImageContainer: React.FC = () => {
   };
 
   // タップ1回目：画像に投票の文字、2回目：投票機能発火
+
   const handleTap = (
-    value: { userId: string; imageUrl: string },
+    value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
-    if (round !== 4 && isAllUsersReady) return;
+    if (round !== 4) return;
+
     if (selectedVoteImage !== index) {
       setSelectedVoteImage(index);
     } else if (userId !== value.userId) {
@@ -130,81 +139,74 @@ export const GeneratedImageContainer: React.FC = () => {
   };
 
   const isDisabled = (
-    value: { userId: string; imageUrl: string },
+    value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
-    if (round !== 4 && isAllUsersReady) return false;
-    return userId === value.userId;
+    return userId === value.userId && round === 4;
   };
 
   const isVoteOverlayVisible = (
-    value: { userId: string; imageUrl: string },
+    value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
-    if (round !== 4 && isAllUsersReady) return false;
-    return userId !== value.userId && selectedVoteImage === index;
+    return (
+      userId !== value.userId && selectedVoteImage === index && round === 4
+    );
   };
 
   return (
-    <div
-      className="flex flex-col items-center justify-center h-screen space-y-4 p-4"
-      onClick={handleBackgroundClick}
-    >
+    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4">
+      {roundImages.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          {roundImages.map((image, index) => (
+            <div
+              key={index}
+              className={`relative p-2 border rounded-lg transition-transform duration-200 cursor-pointer ${
+                selectedVoteImage === index ? 'bg-gray-800/50' : ''
+              } ${
+                userId === image.userId ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              onClick={() => {
+                if (userId !== image.userId && round === 4)
+                  handleTap(image, index);
+              }}
+            >
+              <p className="absolute top-0 left-0 text-sm bg-white px-2 py-1 rounded shadow">
+                {image.userName}
+              </p>
+              <img
+                src={image.imageUrl}
+                alt="Generated"
+                className="w-full h-auto rounded-lg"
+              />
+              {selectedVoteImage === index && round === 4 && (
+                <p className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 text-white font-bold">
+                  投票する
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       {round !== 4 && isAllUsersReady && (
         <>
           <p>全員揃ったから次のステージに移動するね！</p>
-          <CountDown seconds={10} onZero={handleZero} />
+          <CountDown
+            seconds={10}
+            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
+          />
         </>
       )}
       {round === 4 && isAllUsersReady && (
-        <>
-          <p>一番テーマに近い画像に投票してね！</p>
-        </>
+        <p>一番テーマに近い画像に投票してね！</p>
       )}
-      {round === 4 && !isAllUsersReady && (
-        <>
-          <p>集計中だよ！</p>
-        </>
-      )}
+      {round === 4 && !isAllUsersReady && <p>集計中だよ！</p>}
       {round !== 4 && !isAllUsersReady && (
         <>
-          <p>ROUND{round}</p>
+          <p>ROUND {round}</p>
           <p>全員揃うまでもう少し待ってね！</p>
         </>
       )}
-
-      <div className="grid grid-cols-2 gap-4 w-full">
-        {/* 特定のユーザーを先頭に並べ替える */}
-        {[...roundImages]
-          .sort((a, b) => (a.userId === userId ? -1 : 1))
-
-          .map((value, index) => (
-            <div
-              key={index}
-              className={`flex flex-col items-center space-y-4 ${
-                round === 4 && isDisabled(value, index) ? 'opacity-50' : ''
-              }`}
-              role="button"
-              onClick={() => handleTap(value, index)}
-            >
-              <div className="relative w-full h-full rounded-md overflow-hidden border border-gray-300">
-                {/* 左上に userName を表示 */}
-                <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-br-md">
-                  {value.userName}
-                </div>
-                {/* 画像またはプレースホルダー */}
-                <GeneratedImage className="" url={value.imageUrl || ''} />
-                {isVoteOverlayVisible(value, index) && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
-                      投票する
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-      </div>
     </div>
   );
 };
