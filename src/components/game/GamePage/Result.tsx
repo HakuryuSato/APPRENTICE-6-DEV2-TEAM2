@@ -3,9 +3,6 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import {
   gameIdAtom,
-  gamePageModeAtom,
-  userIdAtom,
-  userNameAtom,
 } from "@/atoms/state";
 import { Button } from "@/components/ui/button";
 import { useResetState } from "@/hooks/top/TopPage/useResetState";
@@ -15,62 +12,133 @@ import DrawResult from "./ResultPattern/DrawResult";
 import OnlyResult from "./ResultPattern/OnlyResult";
 import { useAtom } from "jotai";
 import { GameState } from "@/types/GameState";
-import { UserStatus } from "@/types/UserStatus";
+
 import { useResetVercelKV } from "@/hooks/top/TopPage/useResetVercelKV";
 
-type User = UserStatus & {
-  vote: number; // 追加したい項目
-};
+
 
 export const Result: React.FC = () => {
-  // const [resultState, setResultState] = useState<GameState | null>(null); // 修正: 初期値を null に変更
-  // const resultUsers = resultState?.users || []; // デフォルト値を空配列に
-  // console.log(resultState);
+  // const gameState: GameState = {
+  //   gameId: "game12345", // ゲームの一意識別子
+  //   targetTheme: "未来の都市", // 今回のゲームのテーマ
+  //   round: 1, // 現在のラウンド
+  //   users: [
+  //     {
+  //       userId: "user1", // ユーザーのID
+  //       userName: "Alice", // ユーザーの名前
+  //       isReady: true, // 準備完了かどうか
+  //       votedCount:  0, // 投票された回数（オプショナル）
+  //     },
+  //     {
+  //       userId: "user2",
+  //       userName: "Bob",
+  //       isReady: false,
+  //       votedCount: 1,
+  //     },
+  //     {
+  //       userId: "user3",
+  //       userName: "Charlie",
+  //       isReady: true,
+  //       votedCount: 2,
+  //     },
+  //     {
+  //       userId: "user4",
+  //       userName: "Diana",
+  //       isReady: false,
+  //       votedCount: 3,
+  //     },
+  //   ], // ゲームに参加しているユーザーのリスト
+  //   isAllUsersReady: false, // 全員が準備完了かどうか
+  //   images: {
+  //     user1: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false, // エラーが発生していない
+  //         error: null, // エラーがない場合はnull
+  //       },
+  //     ],
+  //     user2: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop",
+  //         isError: true, // 画像生成でエラーが発生した
+  //         error: new Error("Image generation failed"), // エラーの詳細
+  //       },
+  //     ],
+  //     user3: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false,
+  //         error: null,
+  //       },
+  //     ],
+  //     user4: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false,
+  //         error: null,
+  //       },
+  //     ],
+  //   },
+  // };
+  
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [gameId] = useAtom(gameIdAtom)
+  const router = useRouter(); // useRouter もトップレベルで呼び出す
+  const resetState = useResetState(); // フックをトップレベルで呼び出す
+  // vercelKVの削除用
+  const { resetVercelKV } = useResetVercelKV();
 
-  // const [gameId] = useAtom(gameIdAtom);
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     try {
-  //       const response = await fetchGameState(gameId);
-  //       if (!response.ok) throw new Error('Failed to fetch users');
-  //       const data: GameState = await response.json(); // 修正: 型を GameState に指定
-  //       setResultState(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!gameId) return;
 
-  //   fetchUsers();
-  // }, [gameId]); // 修正: gameId を依存配列に追加
+      try {
+        const state = await fetchGameState(gameId);
+        if (state) {
+          setGameState(state);
+        } else {
+          console.error("Game state not found");
+        }
+      } catch (error) {
+        console.error("Error fetching game state:", error);
+      }
+    };
+    fetchData();
+  }, [gameId]);
 
-  const resultUsers = [
-    { userId: "user1", userName: "Alice", vote: 2, isReady: true },
-    { userId: "user2", userName: "Bob", vote: 1, isReady: true },
-    { userId: "user3", userName: "Ciel", vote: 0, isReady: true },
-    { userId: "user4", userName: "Dave", vote: 1, isReady: true },
-  ]; // テスト用のダミーデータ
+  // ロード中表示
+  if (!gameState) {
+    return <p>Loading...</p>;
+  } //Apiが完成したらコメントアウトを外す
+
+  const resultUsers = gameState.users.map((user) => {
+    const userImages = gameState.images[user.userId] || [];
+    const firstImage = userImages[0]?.url || ''; // 画像URLを取得（存在しない場合は空文字）
+    
+    return {
+      userId: user.userId,
+      userName: user.userName,
+      votedCount: user.votedCount || 0, // votedCountがない場合は0を設定
+      image: {
+        user: {
+          url: firstImage,
+        },
+      },
+    };
+  });
 
   if (resultUsers.length === 0) {
     return <p>Loading...</p>; // ロード中の表示
   }
 
   // 1位のユーザーを抽出
-  const sortedUsers = [...resultUsers].sort((a, b) => b.vote - a.vote);
-  const maxVote = sortedUsers[0].vote;
-
+  const sortedUsers = [...resultUsers].sort((a, b) => b.votedCount - a.votedCount);
+  const maxVote = sortedUsers[0].votedCount;
   // 同率1位のユーザーをフィルタリング
-  const drawUsers = sortedUsers.filter((user) => user.vote === maxVote);
+  const drawUsers = sortedUsers.filter((user) => user.votedCount === maxVote);
   const otherUsers = sortedUsers.slice(drawUsers.length);
 
   // ゲームリセットの処理
-  const resetState = useResetState(); // フックをトップレベルで呼び出す
-  const router = useRouter(); // useRouter もトップレベルで呼び出す
-  
-  // vercelKVの削除用
-  const { resetVercelKV } = useResetVercelKV();
-  const [gameId] = useAtom(gameIdAtom)
-
-
   const handleClickResetGame = () => {
     resetVercelKV(gameId) // 該当GameIDの情報をVercelKVから削除
     resetState(); // 状態リセット
@@ -78,8 +146,8 @@ export const Result: React.FC = () => {
   };
 
   return (
-    <>
-      <h1 className="font-semibold text-2xl">Result</h1>
+    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4">
+      <h1 className="font-semibold text-2xl mb-2">結果発表！！</h1>
       {drawUsers.length > 1
         ? (
           // 同率1位が複数人いる場合
@@ -92,10 +160,10 @@ export const Result: React.FC = () => {
 
       <Button
         onClick={handleClickResetGame}
-        className="mt-4 p-2 bg-fly-purple text-white rounded-lg"
+        className="mt-4 p-2 bg-black text-white rounded-lg"
       >
-        end game
+        ゲーム終了
       </Button>
-    </>
+    </div>
   );
 };

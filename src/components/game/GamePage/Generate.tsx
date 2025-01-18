@@ -17,6 +17,7 @@ import {
   userIdAtom,
   userNameAtom,
 } from '@/atoms/state';
+import { LoadingModal } from '@/components/LoadingModal/LoadingModal';
 
 export const Generate: React.FC = () => {
   const [inputText, setInputText] = useState<string>('');
@@ -114,6 +115,7 @@ export const Generate: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen space-y-4 p-4">
+      <LoadingModal isOpen={isLoading} />
       <p className="text-xl font-bold animate-pop-in">ROUND{round}</p>
       <div>テーマ：{theme}</div>
       {!isGenerated ? (
