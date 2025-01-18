@@ -58,4 +58,9 @@ async function kvDel (key: string): Promise<void> {
   await handleKvOperation('del', key)
 }
 
-export { kvGet, kvSet, kvDel }
+async function keyDump():Promise<string[]> {
+  return await kv.hkeys('*');
+}
+
+
+export { kvGet, kvSet, kvDel,keyDump }
