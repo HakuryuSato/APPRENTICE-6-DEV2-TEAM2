@@ -3,35 +3,47 @@ import Image from 'next/image';
 import React from 'react';
 import { GeneratedImage } from '../../GeneratedImage';
 
-type User = UserStatus & {
-  vote: number; // 追加したい項目
-};
-
 interface OnlyResultProps {
-  firstUser: User;
-  otherUsers: User[];
+  firstUser: {
+    userId: string;
+    userName: string;
+    image: {
+      user: {
+        url: string;
+      };
+    };
+    votedCount: number;
+  };
+  otherUsers: Array<{
+    userId: string;
+    userName: string;
+    image: {
+      user: {
+        url: string;
+      };
+    };
+    votedCount: number;
+  }>;
 }
 
 const OnlyResult: React.FC<OnlyResultProps> = ({ firstUser, otherUsers }) => {
   console.log(firstUser);
   console.log(otherUsers);
-  const imageUrl =
-    'https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop';
+  // const imageUrl =
+  //   'https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop';
 
   return (
     <>
-      <h1 className="font-semibold text-2xl text-fly-navy">Result</h1>
-
       {/* 1位のユーザー */}
-      <div className="flex flex-col items-center rounded-lg mb-4">
-        <div className="flex flex-col items-center justify-center p-4 max-w-300 bg-fly-softPurple rounded-lg">
-          <GeneratedImage className="" url={imageUrl} />
-          <div className="flex flex-row items-center justify-center py-4">
-            <h3 className="text-4xl font-bold text-fly-navy">
+      <div className="flex flex-col items-center rounded-lg mb-3 shadow-md">
+        <div className="flex flex-col items-center justify-center p-3 max-w-300 bg-fly-softPurple rounded-lg">
+          <GeneratedImage className="w-52 shadow-md" url={firstUser.image.user.url} />
+          <div className="flex flex-row items-between justify-between pt-4">
+            <h3 className="text-3xl font-bold text-fly-navy">
               {firstUser.userName}
             </h3>
-            <h3 className="text-2xl ml-8 p-1 rounded-md font-semibold bg-fly-navy text-white">
-              {firstUser.vote} point
+            <h3 className="text-xl p-2 ml-4 rounded-md font-semibold bg-fly-deepPurple text-white shadow-lg">
+              {firstUser.votedCount} 票
             </h3>
           </div>
         </div>
@@ -40,13 +52,13 @@ const OnlyResult: React.FC<OnlyResultProps> = ({ firstUser, otherUsers }) => {
       {otherUsers.map((user) => (
         <div
           key={user.userId}
-          className="flex flex-col items-center justify-center p-2 bg-fly-softPurple rounded-lg shadow-md"
+          className="flex flex-row items-center justify-between p-2 bg-fly-softPurple rounded-lg shadow-md mb-2"
         >
-          <GeneratedImage className="" url={imageUrl} />
-          <div className="flex flex-col items-center justify-center pt-2">
+          <GeneratedImage className="w-32 shadow-md" url={user.image.user.url} />
+          <div className="flex flex-col items-center justify-center mr-1">
             <h3 className="text-xl font-bold text-fly-navy">{user.userName}</h3>
-            <h3 className="text-x mt-1 py-1 px-2 rounded-md bg-fly-navy text-white">
-              {user.vote} points
+            <h3 className="text-x mt-1 py-1 px-2 rounded-md bg-fly-deepPurple text-white shadow-lg">
+              {user.votedCount} 票
             </h3>
           </div>
         </div>
