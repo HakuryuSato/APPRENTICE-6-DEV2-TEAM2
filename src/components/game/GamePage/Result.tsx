@@ -18,100 +18,98 @@ import { useResetVercelKV } from "@/hooks/top/TopPage/useResetVercelKV";
 
 
 export const Result: React.FC = () => {
-  const gameState: GameState = {
-    gameId: "game12345", // ゲームの一意識別子
-    targetTheme: "未来の都市", // 今回のゲームのテーマ
-    round: 1, // 現在のラウンド
-    users: [
-      {
-        userId: "user1", // ユーザーのID
-        userName: "Alice", // ユーザーの名前
-        isReady: true, // 準備完了かどうか
-        votedCount:  3, // 投票された回数（オプショナル）
-      },
-      {
-        userId: "user2",
-        userName: "Bob",
-        isReady: false,
-        votedCount: 1,
-      },
-      {
-        userId: "user3",
-        userName: "Charlie",
-        isReady: true,
-        votedCount: 2,
-      },
-      {
-        userId: "user4",
-        userName: "Diana",
-        isReady: false,
-        votedCount: 3,
-      },
-    ], // ゲームに参加しているユーザーのリスト
-    isAllUsersReady: false, // 全員が準備完了かどうか
-    images: {
-      user1: [
-        {
-          url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
-          isError: false, // エラーが発生していない
-          error: null, // エラーがない場合はnull
-        },
-      ],
-      user2: [
-        {
-          url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop",
-          isError: true, // 画像生成でエラーが発生した
-          error: new Error("Image generation failed"), // エラーの詳細
-        },
-      ],
-      user3: [
-        {
-          url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
-          isError: false,
-          error: null,
-        },
-      ],
-      user4: [
-        {
-          url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
-          isError: false,
-          error: null,
-        },
-      ],
-    },
-  };
+  // const gameState: GameState = {
+  //   gameId: "game12345", // ゲームの一意識別子
+  //   targetTheme: "未来の都市", // 今回のゲームのテーマ
+  //   round: 1, // 現在のラウンド
+  //   users: [
+  //     {
+  //       userId: "user1", // ユーザーのID
+  //       userName: "Alice", // ユーザーの名前
+  //       isReady: true, // 準備完了かどうか
+  //       votedCount:  0, // 投票された回数（オプショナル）
+  //     },
+  //     {
+  //       userId: "user2",
+  //       userName: "Bob",
+  //       isReady: false,
+  //       votedCount: 1,
+  //     },
+  //     {
+  //       userId: "user3",
+  //       userName: "Charlie",
+  //       isReady: true,
+  //       votedCount: 2,
+  //     },
+  //     {
+  //       userId: "user4",
+  //       userName: "Diana",
+  //       isReady: false,
+  //       votedCount: 3,
+  //     },
+  //   ], // ゲームに参加しているユーザーのリスト
+  //   isAllUsersReady: false, // 全員が準備完了かどうか
+  //   images: {
+  //     user1: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false, // エラーが発生していない
+  //         error: null, // エラーがない場合はnull
+  //       },
+  //     ],
+  //     user2: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop",
+  //         isError: true, // 画像生成でエラーが発生した
+  //         error: new Error("Image generation failed"), // エラーの詳細
+  //       },
+  //     ],
+  //     user3: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false,
+  //         error: null,
+  //       },
+  //     ],
+  //     user4: [
+  //       {
+  //         url: "https://images.unsplash.com/photo-1736010755388-68a7d4cc0d62?q=80&w=2787&auto=format&fit=crop", // ラウンド1の画像URL
+  //         isError: false,
+  //         error: null,
+  //       },
+  //     ],
+  //   },
+  // };
   
-  // const [gameState, setGameState] = useState<GameState | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameId] = useAtom(gameIdAtom)
   const router = useRouter(); // useRouter もトップレベルで呼び出す
   const resetState = useResetState(); // フックをトップレベルで呼び出す
   // vercelKVの削除用
   const { resetVercelKV } = useResetVercelKV();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!gameId) return;
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (!gameId) return;
+      try {
+        const state = await fetchGameState(gameId);
+        if (state) {
+          setGameState(state);
+        } else {
+          console.error("Game state not found");
+        }
+      } catch (error) {
+        console.error("Error fetching game state:", error);
+      }
+    };
+    fetchData();
+  }, [gameId]);
 
-  //     try {
-  //       const state = await fetchGameState(gameId);
-  //       if (state) {
-  //         setGameState(state);
-  //       } else {
-  //         console.error("Game state not found");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching game state:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [gameId]);
-
-  // // ロード中表示
-  // if (!gameState) {
-  //   return <p>Loading...</p>;
-  // }
+  // ロード中表示
+  if (!gameState) {
+    return <p>Loading...</p>;
+  } //Apiが完成したらコメントアウトを外す
 
   const resultUsers = gameState.users.map((user) => {
     const userImages = gameState.images[user.userId] || [];

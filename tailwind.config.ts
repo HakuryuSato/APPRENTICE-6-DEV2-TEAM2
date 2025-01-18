@@ -54,6 +54,7 @@ export default {
         fly: {
           //fly.ioから抽出した色
           deepPurple: '#6a3feb', // 深い紫
+          vividPurple: '#8237EC', // 強い紫
           softPurple: '#CDBDFA', // 薄い紫
           navy: '#281950', // ネイビー
           blue: '#65A0FA', // 水色
