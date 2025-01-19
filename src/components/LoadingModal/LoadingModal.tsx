@@ -9,15 +9,19 @@ import styles from './LoadingModal.module.css';
 import { GeneratedImage } from '../game/GeneratedImage';
 
 type LoadingModalProps = {
+  modalText: string;
   isOpen: boolean;
 };
 
-export const LoadingModal: React.FC<LoadingModalProps> = ({ isOpen }) => {
+export const LoadingModal: React.FC<LoadingModalProps> = ({
+  modalText,
+  isOpen,
+}) => {
   return (
     <Dialog open={isOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>画像生成中...</DialogTitle>
+          <DialogTitle>{modalText}...</DialogTitle>
         </DialogHeader>
         {/* 画像とか入れるならここ */}
         <div className="flex justify-center items-center space-y-2">

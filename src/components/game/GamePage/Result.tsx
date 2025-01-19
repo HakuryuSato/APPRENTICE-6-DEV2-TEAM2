@@ -1,21 +1,17 @@
-"use client";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import {
-  gameIdAtom,
-} from "@/atoms/state";
-import { Button } from "@/components/ui/button";
-import { useResetState } from "@/hooks/top/TopPage/useResetState";
-import { useRouter } from "next/navigation";
-import { fetchGameState } from "@/utils/client/apiClient";
-import DrawResult from "./ResultPattern/DrawResult";
-import OnlyResult from "./ResultPattern/OnlyResult";
-import { useAtom } from "jotai";
-import { GameState } from "@/types/GameState";
+'use client';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { gameIdAtom } from '@/atoms/state';
+import { Button } from '@/components/ui/button';
+import { useResetState } from '@/hooks/top/TopPage/useResetState';
+import { useRouter } from 'next/navigation';
+import { fetchGameState } from '@/utils/client/apiClient';
+import DrawResult from './ResultPattern/DrawResult';
+import OnlyResult from './ResultPattern/OnlyResult';
+import { useAtom } from 'jotai';
+import { GameState } from '@/types/GameState';
 
-import { useResetVercelKV } from "@/hooks/top/TopPage/useResetVercelKV";
-
-
+import { useResetVercelKV } from '@/hooks/top/TopPage/useResetVercelKV';
 
 export const Result: React.FC = () => {
   // const gameState: GameState = {
@@ -80,9 +76,9 @@ export const Result: React.FC = () => {
   //     ],
   //   },
   // };
-  
+
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [gameId] = useAtom(gameIdAtom)
+  const [gameId] = useAtom(gameIdAtom);
   const router = useRouter(); // useRouter もトップレベルで呼び出す
   const resetState = useResetState(); // フックをトップレベルで呼び出す
   // vercelKVの削除用
@@ -97,10 +93,10 @@ export const Result: React.FC = () => {
         if (state) {
           setGameState(state);
         } else {
-          console.error("Game state not found");
+          console.error('Game state not found');
         }
       } catch (error) {
-        console.error("Error fetching game state:", error);
+        console.error('Error fetching game state:', error);
       }
     };
     fetchData();
@@ -125,7 +121,7 @@ export const Result: React.FC = () => {
   const resultUsers = gameState.users.map((user) => {
     const userImages = gameState.images[user.userId] || [];
     const firstImage = userImages[0]?.url || ''; // 画像URLを取得（存在しない場合は空文字）
-    
+
     return {
       userId: user.userId,
       userName: user.userName,
@@ -143,7 +139,9 @@ export const Result: React.FC = () => {
   }
 
   // 1位のユーザーを抽出
-  const sortedUsers = [...resultUsers].sort((a, b) => b.votedCount - a.votedCount);
+  const sortedUsers = [...resultUsers].sort(
+    (a, b) => b.votedCount - a.votedCount
+  );
   const maxVote = sortedUsers[0].votedCount;
   // 同率1位のユーザーをフィルタリング
   const drawUsers = sortedUsers.filter((user) => user.votedCount === maxVote);
@@ -151,23 +149,21 @@ export const Result: React.FC = () => {
 
   // ゲームリセットの処理
   const handleClickResetGame = () => {
-    resetVercelKV(gameId) // 該当GameIDの情報をVercelKVから削除
+    resetVercelKV(gameId); // 該当GameIDの情報をVercelKVから削除
     resetState(); // 状態リセット
-    router.push("/"); // トップページに遷移
+    router.push('/'); // トップページに遷移
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4">
       <h1 className="font-semibold text-2xl mb-2">結果発表！！</h1>
-      {drawUsers.length > 1
-        ? (
-          // 同率1位が複数人いる場合
-          <DrawResult drawUsers={drawUsers} otherUsers={otherUsers} />
-        )
-        : (
-          // 1人だけ1位の場合
-          <OnlyResult firstUser={drawUsers[0]} otherUsers={otherUsers} />
-        )}
+      {drawUsers.length > 1 ? (
+        // 同率1位が複数人いる場合
+        <DrawResult drawUsers={drawUsers} otherUsers={otherUsers} />
+      ) : (
+        // 1人だけ1位の場合
+        <OnlyResult firstUser={drawUsers[0]} otherUsers={otherUsers} />
+      )}
 
       <Button
         onClick={handleClickResetGame}

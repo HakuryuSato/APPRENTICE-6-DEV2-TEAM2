@@ -4,13 +4,12 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 interface BgmContextType {
   isPlaying: boolean;
   togglePlay: () => void;
-  setVolume: (volume: number) => void;
 }
 
 const BgmContext = createContext<BgmContextType | undefined>(undefined);
 
 export const BgmProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isPlaying, setIsPlaying] = useState(true); // ページ読み込み時に true に設定
+  const [isPlaying, setIsPlaying] = useState(false); // ページ読み込み時に false に設定
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export const BgmProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('BGM 再生成功');
       } catch (error) {
         console.warn('BGM の自動再生がブロックされました:', error);
-        setIsPlaying(true); // 再生失敗でも状態を true に設定
+        setIsPlaying(false); // 再生失敗でも状態を true に設定
       }
     };
 
@@ -51,14 +50,8 @@ export const BgmProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const setVolume = (volume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  };
-
   return (
-    <BgmContext.Provider value={{ isPlaying, togglePlay, setVolume }}>
+    <BgmContext.Provider value={{ isPlaying, togglePlay }}>
       {children}
     </BgmContext.Provider>
   );
