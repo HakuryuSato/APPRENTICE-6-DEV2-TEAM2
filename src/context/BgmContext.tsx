@@ -15,7 +15,7 @@ export const BgmProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const audio = new Audio('/sound/BGM_01.wav'); // BGM のファイルパス BGM_01.wav,BGM_02.wav,BGM_03.wav
     audio.loop = true; // ループ再生
-    audio.volume = 0.2; // 初期音量
+    audio.volume = 0.1; //固定
     audioRef.current = audio;
 
     // 自動再生を試みる
