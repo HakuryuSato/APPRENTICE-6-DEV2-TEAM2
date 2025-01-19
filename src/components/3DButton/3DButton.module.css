@@ -1,7 +1,7 @@
 /* 3Dボタンのスタイル */
 .btn {
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.5;
   position: relative;
   display: inline-block;
@@ -105,7 +105,11 @@
 /* テキストの背景を追加して読みやすくする */
 .btn-3d-flip-box-face--front2,
 .btn-3d-flip-box-face--back2 {
-  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
-  font-size: 1.2rem;
+  text-shadow:
+    0 0 3px #fff,
+    0 0 3px #fff,
+    0 0 3px #fff,
+    0 0 3px #fff;
+  font-size: 1rem;
   padding: 0.5rem;
 }
