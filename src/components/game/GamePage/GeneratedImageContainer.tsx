@@ -168,8 +168,21 @@ export const GeneratedImageContainer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4">
+    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4 relative">
       <LoadingModal modalText="集計中" isOpen={isLoading} />
+      {round !== 4 && isAllUsersReady && (
+        <div>
+          <CountDown
+            seconds={10}
+            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
+          />
+        </div>
+      )}
+      {round !== 4 && isAllUsersReady && (
+        <div>
+          <p>全員揃ったから次のステージに移動するね！</p>
+        </div>
+      )}
       {roundImages.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
           {roundImages.map((image, index) => (
@@ -201,15 +214,6 @@ export const GeneratedImageContainer: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
-      {round !== 4 && isAllUsersReady && (
-        <>
-          <p>全員揃ったから次のステージに移動するね！</p>
-          <CountDown
-            seconds={10}
-            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
-          />
-        </>
       )}
       {round === 4 && isAllUsersReady && (
         <p>一番テーマに近い画像に投票してね！</p>
