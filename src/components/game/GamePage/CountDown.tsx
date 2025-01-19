@@ -16,7 +16,7 @@ export const CountDown: React.FC<CountDownProps> = ({ seconds, onZero }) => {
     : {};
 
   return (
-    <div className="absolute top-4 right-4 w-1/6 bg-white p-4 rounded-lg shadow-md flex items-center justify-center">
+    <div className="absolute top-4 right-4 w-1/6 p-4 rounded-lg shadow-md flex items-center justify-center">
       <span
         key={remainSeconds} // リトリガーのためにkeyを動的に設定
         className={`text-6xl font-bold ${
