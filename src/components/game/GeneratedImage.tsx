@@ -12,7 +12,7 @@ export const GeneratedImage: React.FC<GeneratedImageProps> = ({
       {/* classNameのwidthによって画像のサイズを変えれます。
           使用する際に、next.config.tsに、許可する画像のホスト名を追加する必要があります
       */}
-      <AspectRatio ratio={4 / 3}>
+      <AspectRatio ratio={1 / 1}>
         <Image
           // src={imageUrl}
           src={url}
