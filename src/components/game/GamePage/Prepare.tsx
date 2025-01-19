@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { useAtom } from 'jotai';
 import {
   userNameAtom,
@@ -43,7 +44,7 @@ export const Prepare: React.FC = () => {
     } catch (error) {
       console.error('Error fetching game state:', error);
     }
-  }, 100000);
+  }, 5000);
 
   useEffect(() => {
     const progressMapping = [0, 25, 50, 75, 100];
@@ -71,7 +72,7 @@ export const Prepare: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col justify-center items-center gap-4 h-screen w-full p-4">
       <Button
         onClick={handleClickBack}
         className="absolute top-4 left-4 bg-fly-softPurple hover:bg-fly-blue text-black"
@@ -79,10 +80,25 @@ export const Prepare: React.FC = () => {
         戻る
       </Button>
       <div className="flex items-center justify-center">
+        <Button
+          variant="outline"
+          className="btn-md"
+          onClick={() =>
+            toast('あがさんって呼んでもええよ', {
+              description: `${userName}ならいけるよ。大丈夫だよ`,
+              action: {
+                label: '戻す',
+                onClick: () => console.log('Undo'),
+              },
+            })
+          }
+        >
+          阿川のお言葉...
+        </Button>
         <img
           src="/images/agawasan.svg"
           alt="agawasan"
-          className="rounded-full w-[80%] h-[80%]"
+          className="rounded-full w-[75%] h-[75%]"
         />
       </div>
       <div className="text-center">
@@ -95,8 +111,8 @@ export const Prepare: React.FC = () => {
           <h3 className="text-red-500 text-lg font-medium">
             全員参加するまでお待ちください
           </h3>
-          <p>{`${usersLength} / 4`}</p>
-          <Progress value={progress} className="w-full" />
+          <p>{`${usersLength}人 / 4人中`}</p>
+          <Progress value={progress} className="w-[80%]" />
         </>
       ) : (
         <div className="text-center">

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { Potta_One } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from "@/styles/theme-provider"
+import { ThemeProvider } from '@/styles/theme-provider';
 import { BgmProvider } from '@/context/BgmContext';
+import { Toaster } from '@/components/ui/sonner';
 
 const pottaOne = Potta_One({
   subsets: ['latin'], // 必要に応じてサブセットを指定
@@ -22,18 +23,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-      // 文字フォントの指定
+        // 文字フォントの指定
         className={`${pottaOne.className} antialiased bg-cover bg-center bg-fixed bg-[url('/kami.jpeg')]`}
       >
         <BgmProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+          <Toaster />
         </BgmProvider>
       </body>
     </html>
