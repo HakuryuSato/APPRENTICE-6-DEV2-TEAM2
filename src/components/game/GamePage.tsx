@@ -33,7 +33,7 @@ export const GamePage: React.FC = () => {
             marginTop: '20px', // 上のコンポーネントとの間隔を追加
           }}
         >
-          <GlobalState />
+{/*           <GlobalState /> */}
         </div>
       </div>
     </>
