@@ -61,7 +61,7 @@ export async function generateImage(req: NextRequest): Promise<GenerateImage> {
       'Image generation error:',
       error instanceof Error ? error.message : 'Unknown error'
     );
-    return { url: '' };
+    return { url: '/images/miserarenaiyo.png' };
   }
 }
 
