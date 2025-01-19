@@ -11,6 +11,7 @@ import {
 import { usePolling } from '@/hooks/game/GamePage/usePolling';
 import { fetchGameState, updateGameState } from '@/utils/client/apiClient';
 import { CountDown } from './CountDown';
+import { LoadingModal } from '@/components/LoadingModal/LoadingModal';
 
 export const GeneratedImageContainer: React.FC = () => {
   const [userId] = useAtom(userIdAtom);
@@ -25,6 +26,7 @@ export const GeneratedImageContainer: React.FC = () => {
   const [selectedVoteImage, setSelectedVoteImage] = useState<number | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchAndUpdateImages = async () => {
     try {
@@ -76,6 +78,7 @@ export const GeneratedImageContainer: React.FC = () => {
 
   useEffect(() => {
     if (isAllUsersReady) {
+      setIsLoading(false);
       stopPolling();
       stopVotePolling(); // ポーリング停止
       if (round === 4) {
@@ -94,28 +97,34 @@ export const GeneratedImageContainer: React.FC = () => {
     value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
-    console.log(`Vote ${index + 1} clicked!`);
     // voteではuserStatusは現在未使用ですが、拡張性を考慮して含めています
     const userStatus = {
       userId: userId,
       userName: userName,
       isReady: true,
     };
-    await updateGameState({
-      gameId: gameId,
-      gameStateRequestType: 'vote',
-      userStatus,
-      voteTargetUserId: value.userId,
-    });
+    try {
+      // `vote`を実行
+      await updateGameState({
+        gameId: gameId,
+        gameStateRequestType: 'vote',
+        userStatus,
+        voteTargetUserId: value.userId,
+      });
 
-    await updateGameState({
-      gameId: gameId,
-      gameStateRequestType: 'ready',
-      userStatus,
-    });
+      // `ready`を実行
+      await updateGameState({
+        gameId: gameId,
+        gameStateRequestType: 'ready',
+        userStatus,
+      });
 
-    setIsAllUsersReady(false);
-    startVotePolling();
+      setIsAllUsersReady(false);
+      startVotePolling();
+    } catch (error) {
+      console.error('Error in handleVoted:', error);
+      alert('リクエスト中にエラーが発生しました。もう一度お試しください。');
+    }
   };
 
   // 画像以外をクリックしたら選択解除
@@ -129,11 +138,15 @@ export const GeneratedImageContainer: React.FC = () => {
     value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
+    console.log(`今はラウンド${round}でタップされました`);
+    console.log(`今はindex${index}です`);
+    console.log(`今は${selectedVoteImage}が選ばれています`);
     if (round !== 4) return;
 
     if (selectedVoteImage !== index) {
       setSelectedVoteImage(index);
     } else if (userId !== value.userId) {
+      setIsLoading(true);
       handleVoted(value, index);
     }
   };
@@ -155,7 +168,21 @@ export const GeneratedImageContainer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4">
+    <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4 relative">
+      <LoadingModal modalText="集計中" isOpen={isLoading} />
+      {round !== 4 && isAllUsersReady && (
+        <div>
+          <CountDown
+            seconds={10}
+            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
+          />
+        </div>
+      )}
+      {round !== 4 && isAllUsersReady && (
+        <div>
+          <p>全員揃ったから次のステージに移動するね！</p>
+        </div>
+      )}
       {roundImages.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
           {roundImages.map((image, index) => (
@@ -187,15 +214,6 @@ export const GeneratedImageContainer: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
-      {round !== 4 && isAllUsersReady && (
-        <>
-          <p>全員揃ったから次のステージに移動するね！</p>
-          <CountDown
-            seconds={10}
-            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
-          />
-        </>
       )}
       {round === 4 && isAllUsersReady && (
         <p>一番テーマに近い画像に投票してね！</p>

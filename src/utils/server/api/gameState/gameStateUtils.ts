@@ -5,10 +5,11 @@ import { kvSet, kvGet } from '@/utils/server/vercelKVHandler';
 import { targetThemes } from './targetThemes';
 
 // GameStateRequestの処理を行う関数  -------------------------------------------------
-export async function handleGameStateRequest (
+export async function handleGameStateRequest(
   request: GameStateRequest
 ): Promise<GameState | Response> {
-  const { gameId, gameStateRequestType, userStatus, voteTargetUserId } = request;
+  const { gameId, gameStateRequestType, userStatus, voteTargetUserId } =
+    request;
 
   // gameIdまたはgameStateRequestTypeがなければエラー
   if (!gameId || !gameStateRequestType) {
@@ -56,7 +57,7 @@ export async function handleGameStateRequest (
 
       if (userStatus) {
         const user = gameState.users.find(
-          user => user.userId === userStatus.userId
+          (user) => user.userId === userStatus.userId
         );
         if (user) {
           user.isReady = userStatus.isReady;
@@ -67,14 +68,25 @@ export async function handleGameStateRequest (
     }
 
     case 'vote': {
-      const targetUser = gameState.users.find(user => user.userId === voteTargetUserId);
+      const targetUser = gameState.users.find(
+        (user) => user.userId === voteTargetUserId
+      );
 
       // ユーザーが存在し、votedCountプロパティがあるか
-      if (!targetUser?.votedCount) return responseWithError('user not found in gameState, or does not have a valid votedCount property', 404);
+      if (!targetUser) {
+        return responseWithError('User not found', 404);
+      }
+
+      // `votedCount`を初期化
+      if (typeof targetUser.votedCount !== 'number') {
+        targetUser.votedCount = 0;
+      }
 
       // votedCountを+1して終了
-      targetUser.votedCount+=1
-      
+      targetUser.votedCount += 1;
+
+      await handleSetGameState(gameState); // ここでtargetUser.votedCountを保存
+
       break;
     }
   }
@@ -90,7 +102,7 @@ export async function handleGameStateRequest (
 
 // 全員が準備完了になったら5秒後にisReadyを全てfalseにする関数  -------------------------------------------------
 // 注:Vercelではタイムアウト10秒のため待機時間を長く設定しすぎないこと
-export async function handleGoToNextPhase (gameState: GameState) {
+export async function handleGoToNextPhase(gameState: GameState) {
   // すでにtrueなら何もしない
   if (gameState.isAllUsersReady) return;
 
@@ -118,7 +130,7 @@ export async function handleGoToNextPhase (gameState: GameState) {
 }
 
 // ユーザーをGameStateに追加する関数 -------------------------------------------------
-export function addUserToGameState (
+export function addUserToGameState(
   gameState: GameState,
   userStatus: UserStatus
 ): void {
@@ -140,35 +152,35 @@ export function addUserToGameState (
 }
 
 // GameState更新用共通関数 -------------------------------------------------
-export async function handleSetGameState (gameState: GameState) {
+export async function handleSetGameState(gameState: GameState) {
   await kvSet(gameState.gameId, gameState);
 }
 
 // 全ユーザーが準備完了済みか判定する関数 -------------------------------------------------
-export function getAllReady (users: UserStatus[]) {
+export function getAllReady(users: UserStatus[]) {
   if (users.length !== 4) return false;
-  return users.every(user => user.isReady);
+  return users.every((user) => user.isReady);
 }
 
 // 全ユーザーのisReadyをfalseする関数 -------------------------------------------------
-export function resetAllUsersReadyState (gameState: GameState) {
-  gameState.users.forEach(user => {
+export function resetAllUsersReadyState(gameState: GameState) {
+  gameState.users.forEach((user) => {
     user.isReady = false;
   });
 }
 
 // 一定時間待機する関数 -------------------------------------------------
-export function delayMs (ms: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, ms));
+export function delayMs(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
 // ランダムなお題を返す関数 -------------------------------------------------
-export function getRandomTargetTheme () {
+export function getRandomTargetTheme() {
   return targetThemes[Math.floor(Math.random() * targetThemes.length)];
 }
 
 // GameStateを初期化して作成する関数 -------------------------------------------------
-export function createGameState (gameId: string, userStatus: UserStatus) {
+export function createGameState(gameId: string, userStatus: UserStatus) {
   return {
     gameId: gameId,
     round: 0, // 0が最初の部屋入室、1以降がゲーム

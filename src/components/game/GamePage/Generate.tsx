@@ -115,7 +115,7 @@ export const Generate: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen space-y-4 p-4">
-      <LoadingModal isOpen={isLoading} />
+      <LoadingModal modalText="生成中" isOpen={isLoading} />
       <p className="text-xl font-bold animate-pop-in">ROUND{round}</p>
       <div>テーマ：{theme}</div>
       {!isGenerated ? (
