@@ -1,9 +1,12 @@
 // app/game/[game-uuid]/page.tsx
 'use client';
 
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { useAtom } from 'jotai';
 import {
   userNameAtom,
@@ -21,12 +24,19 @@ export const Prepare: React.FC = () => {
   const [userName] = useAtom(userNameAtom);
   const [userId] = useAtom(userIdAtom);
   const [, setTemporaryTopGameLayoutMode] = useAtom(gamePageModeAtom);
+  const [usersLength, setUsersLength] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(13);
 
   const { startPolling, stopPolling } = usePolling(async () => {
     try {
       const gameState = await fetchGameState(gameId);
       if (gameState && gameState.users) {
         console.log(`人数：${gameState.users.length}`);
+        setUsersLength(gameState.users.length);
+
+        if (gameState.users.length === 4) {
+          setProgress(100);
+        }
         setIsAllUsersReady(gameState.isAllUsersReady);
       } else {
         console.error('Game state or users are undefined');
@@ -34,7 +44,12 @@ export const Prepare: React.FC = () => {
     } catch (error) {
       console.error('Error fetching game state:', error);
     }
-  }, 1000);
+  }, 5000);
+
+  useEffect(() => {
+    const progressMapping = [0, 25, 50, 75, 100];
+    setProgress(progressMapping[usersLength] || 0);
+  }, [usersLength]);
 
   useEffect(() => {
     startPolling();
@@ -46,7 +61,7 @@ export const Prepare: React.FC = () => {
       stopPolling();
       const timeout = setTimeout(() => {
         setTemporaryTopGameLayoutMode({ mode: 'generate' });
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timeout);
     }
   }, [isAllUsersReady]);
@@ -57,16 +72,48 @@ export const Prepare: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col justify-center items-center gap-4 h-screen w-full p-4">
+      <Button
+        onClick={handleClickBack}
+        className="absolute top-4 left-4 bg-fly-softPurple hover:bg-fly-blue text-black"
+      >
+        戻る
+      </Button>
+      <div className="flex items-center justify-center">
+        <Button
+          variant="outline"
+          className="btn-md"
+          onClick={() =>
+            toast('あがさんって呼んでもええよ', {
+              description: `${userName}ならいけるよ。大丈夫だよ`,
+              action: {
+                label: '戻す',
+                onClick: () => console.log('Undo'),
+              },
+            })
+          }
+        >
+          阿川のお言葉...
+        </Button>
+        <img
+          src="/images/agawasan.svg"
+          alt="agawasan"
+          className="rounded-full w-[75%] h-[75%]"
+        />
+      </div>
       <div className="text-center">
-        <p className="font-semibold">Name: {userName}</p>
-        <p className="font-semibold">Room: {gameId}</p>
+        <p className="font-semibold">ニックネーム: {userName}</p>
+        <p className="font-semibold">部屋の合言葉: {gameId}</p>
       </div>
 
       {!isAllUsersReady ? (
-        <h3 className="text-red-500 text-lg font-medium">
-          全員揃うまでお待ちください
-        </h3>
+        <>
+          <h3 className="text-red-500 text-lg font-medium">
+            全員参加するまでお待ちください
+          </h3>
+          <p>{`${usersLength}人 / 4人中`}</p>
+          <Progress value={progress} className="w-[80%]" />
+        </>
       ) : (
         <div className="text-center">
           <p className="text-fly-purple font-bold text-xl animate-pop-in">
@@ -74,8 +121,6 @@ export const Prepare: React.FC = () => {
           </p>
         </div>
       )}
-
-      <Button onClick={handleClickBack}>戻る</Button>
     </div>
   );
 };
