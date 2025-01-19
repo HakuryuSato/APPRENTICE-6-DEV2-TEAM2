@@ -181,10 +181,20 @@ export const GeneratedImageContainer: React.FC = () => {
           />
         </div>
       )} */}
-      {round !== ROUND_NUM && isAllUsersReady && (
+      {/* {round !== ROUND_NUM && isAllUsersReady && (
         <div>
           <p>全員揃ったから次のステージに移動するね！</p>
         </div>
+      )} */}
+      {round === ROUND_NUM && isAllUsersReady && (
+        <p className="animate-pop-in">一番テーマに近い画像に投票してね！</p>
+      )}
+      {round === ROUND_NUM && !isAllUsersReady && <p>集計中だよ！</p>}
+      {round !== ROUND_NUM && !isAllUsersReady && (
+        <>
+          <p>ROUND {round}</p>
+          <p>全員揃うまでもう少し待ってね！</p>
+        </>
       )}
       {roundImages.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
@@ -217,16 +227,6 @@ export const GeneratedImageContainer: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
-      {round === ROUND_NUM && isAllUsersReady && (
-        <p>一番テーマに近い画像に投票してね！</p>
-      )}
-      {round === ROUND_NUM && !isAllUsersReady && <p>集計中だよ！</p>}
-      {round !== ROUND_NUM && !isAllUsersReady && (
-        <>
-          <p>ROUND {round}</p>
-          <p>全員揃うまでもう少し待ってね！</p>
-        </>
       )}
     </div>
   );
