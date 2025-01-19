@@ -102,17 +102,6 @@ export const Result: React.FC = () => {
     fetchData();
   }, [gameId]);
 
-  // 効果音再生
-  useEffect(() => {
-    if (gameState) {
-      const audio = new Audio("/sound/和太鼓でカカッ.mp3"); // 効果音ファイルのパス（public/sound/effect.mp3 に配置）
-      audio.volume = 0.5; // 音量を設定
-      audio.play().catch((error) => {
-        console.warn("効果音の再生がブロックされました:", error);
-      });
-    }
-  }, [gameState]);
-
   // ロード中表示
   if (!gameState) {
     return <p>Loading...</p>;
