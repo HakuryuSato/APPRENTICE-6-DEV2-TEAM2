@@ -14,6 +14,7 @@ import { CountDown } from './CountDown';
 import { LoadingModal } from '@/components/LoadingModal/LoadingModal';
 
 export const GeneratedImageContainer: React.FC = () => {
+  const ROUND_NUM = 2;
   const [userId] = useAtom(userIdAtom);
   const [gameId] = useAtom(gameIdAtom);
   const [userName] = useAtom(userNameAtom);
@@ -81,7 +82,7 @@ export const GeneratedImageContainer: React.FC = () => {
       setIsLoading(false);
       stopPolling();
       stopVotePolling(); // ポーリング停止
-      if (round === 4) {
+      if (round === ROUND_NUM) {
         setTemporaryTopGameLayoutMode({ mode: 'result' });
       } else {
         setRound(round + 1);
@@ -141,7 +142,7 @@ export const GeneratedImageContainer: React.FC = () => {
     console.log(`今はラウンド${round}でタップされました`);
     console.log(`今はindex${index}です`);
     console.log(`今は${selectedVoteImage}が選ばれています`);
-    if (round !== 4) return;
+    if (round !== ROUND_NUM) return;
 
     if (selectedVoteImage !== index) {
       setSelectedVoteImage(index);
@@ -155,7 +156,7 @@ export const GeneratedImageContainer: React.FC = () => {
     value: { userId: string; imageUrl: string; userName?: string },
     index: number
   ) => {
-    return userId === value.userId && round === 4;
+    return userId === value.userId && round === ROUND_NUM;
   };
 
   const isVoteOverlayVisible = (
@@ -163,22 +164,24 @@ export const GeneratedImageContainer: React.FC = () => {
     index: number
   ) => {
     return (
-      userId !== value.userId && selectedVoteImage === index && round === 4
+      userId !== value.userId &&
+      selectedVoteImage === index &&
+      round === ROUND_NUM
     );
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4 p-4 relative">
       <LoadingModal modalText="集計中" isOpen={isLoading} />
-      {round !== 4 && isAllUsersReady && (
+      {/* {round !== ROUND_NUM && isAllUsersReady && (
         <div>
           <CountDown
             seconds={10}
-            onZero={() => setTemporaryTopGameLayoutMode({ mode: 'generate' })}
+            onZero={() => {handleZero}}
           />
         </div>
-      )}
-      {round !== 4 && isAllUsersReady && (
+      )} */}
+      {round !== ROUND_NUM && isAllUsersReady && (
         <div>
           <p>全員揃ったから次のステージに移動するね！</p>
         </div>
@@ -194,7 +197,7 @@ export const GeneratedImageContainer: React.FC = () => {
                 userId === image.userId ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={() => {
-                if (userId !== image.userId && round === 4)
+                if (userId !== image.userId && round === ROUND_NUM)
                   handleTap(image, index);
               }}
             >
@@ -206,7 +209,7 @@ export const GeneratedImageContainer: React.FC = () => {
                 alt="Generated"
                 className="w-full h-auto rounded-lg"
               />
-              {selectedVoteImage === index && round === 4 && (
+              {selectedVoteImage === index && round === ROUND_NUM && (
                 <p className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 text-white font-bold">
                   投票する
                 </p>
@@ -215,11 +218,11 @@ export const GeneratedImageContainer: React.FC = () => {
           ))}
         </div>
       )}
-      {round === 4 && isAllUsersReady && (
+      {round === ROUND_NUM && isAllUsersReady && (
         <p>一番テーマに近い画像に投票してね！</p>
       )}
-      {round === 4 && !isAllUsersReady && <p>集計中だよ！</p>}
-      {round !== 4 && !isAllUsersReady && (
+      {round === ROUND_NUM && !isAllUsersReady && <p>集計中だよ！</p>}
+      {round !== ROUND_NUM && !isAllUsersReady && (
         <>
           <p>ROUND {round}</p>
           <p>全員揃うまでもう少し待ってね！</p>
