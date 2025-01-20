@@ -83,4 +83,3 @@ npm installでnode_modulesの更新が必要です
 | API  | GET/POST     | api/game-state     | ゲーム進行状況の確認と更新を行う                         |
 | API  | POST         | api/generate-image | 渡されたプロンプトに応じて生成された画像を1枚返す        |
 | API  | POST         | api/translate      | 渡された日本語のテキストを英語にして返す                 |
-| API  | POST         | api/similarity     | 渡された画像数枚とテーマのテキストから類似度を計算し返す |
